@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MatLib — Simple Admin (no npm)</title>
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <h1>MatLib — Simple Admin (no server)</h1>
+      <p class="muted">Import / edit / export question JSON. Images are stored inline as base64.</p>
+    </header>
+
+    <section class="topbar">
+      <label class="file-btn">
+        Import JSON
+        <input id="importJson" type="file" accept=".json" />
+      </label>
+
+      <button id="btnNew">New question</button>
+      <button id="btnExport">Export JSON</button>
+      <button id="btnClear">Clear all</button>
+    </section>
+
+    <section id="list"></section>
+
+    <section id="editor" class="card" hidden>
+      <h2 id="editorTitle">New question</h2>
+      <form id="qForm">
+        <label>Exam:
+          <input name="exam" placeholder="e.g. TMUA, ESAT, SAT" />
+        </label>
+
+        <label>Year:
+          <input name="year" type="number" placeholder="e.g. 2021" />
+        </label>
+
+        <label>Question (text):
+          <textarea name="question" rows="3" placeholder="Question text"></textarea>
+        </label>
+
+        <label>Options (one per line):
+          <textarea name="options" rows="4" placeholder="One option per line"></textarea>
+        </label>
+
+        <label>Answer (0-based index):
+          <input name="answer" type="number" min="0" value="0" />
+          <small class="muted">First option = 0, second = 1, ...</small>
+        </label>
+
+        <label>Explanation:
+          <textarea name="explanation" rows="3" placeholder="Short explanation"></textarea>
+        </label>
+
+        <label>Image (optional):
+          <input id="imageInput" type="file" accept="image/*" />
+        </label>
+
+        <div id="imagePreview"></div>
+
+        <div class="form-actions">
+          <button type="submit">Save</button>
+          <button id="btnCancel" type="button">Cancel</button>
+        </div>
+      </form>
+    </section>
+
+    <footer>
+      <small class="muted">
+        Notes: This admin stores images as base64 inside the JSON (convenient for portability; may increase file size).
+        For production use host images separately and keep `image` as a URL/path.
+      </small>
+    </footer>
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html>

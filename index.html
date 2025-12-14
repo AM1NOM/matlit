@@ -3,14 +3,22 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MatLib — practice multi-choice admissions questions</title>
+  <title>MatLib — Practice Questions</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <main class="container">
     <header class="header">
       <h1>MatLib</h1>
-      <p class="tagline">Random 5-question practice from UK admissions & SAT-style tests</p>
+      <p class="tagline">Random 5-question practice from admissions & SAT-style tests</p>
+      <div id="authArea" class="auth-area">
+        <button id="loginBtn" class="btn">Sign in with Google</button>
+        <div id="userInfo" style="display:none;">
+          <img id="userPic" alt="" class="avatar" />
+          <span id="userName"></span>
+          <button id="logoutBtn" class="btn ghost">Logout</button>
+        </div>
+      </div>
     </header>
 
     <section class="controls">
@@ -30,14 +38,16 @@
 
     <div class="actions">
       <button id="submitBtn" class="btn primary" disabled>Submit answers</button>
+      <button id="saveScoreBtn" class="btn" hidden>Save score</button>
       <button id="nextBtn" class="btn" hidden>New set</button>
     </div>
 
     <footer class="footer">
-      <small>Designed for practice — be sure to respect exam copyright when uploading official content.</small>
+      <small>Respect exam copyright when uploading official content.</small>
     </footer>
   </main>
 
-  <script src="app.js" type="module"></script>
+  <!-- Firebase JS SDKs and app logic -->
+  <script type="module" src="app.js"></script>
 </body>
 </html>

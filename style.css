@@ -5,7 +5,6 @@
   --accent:#2563eb;
   --success:#16a34a;
   --danger:#dc2626;
-  --glass: rgba(255,255,255,0.6);
   --radius:12px;
   --shadow: 0 6px 20px rgba(18,24,40,0.06);
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
@@ -17,119 +16,49 @@ body{
   margin:0;
   background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%);
   color:#0f172a;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
   padding:28px;
 }
 
-.container{
-  max-width:880px;
-  margin:0 auto;
-}
+.container{ max-width:880px; margin:0 auto; }
 
-.header h1{
-  margin:0;
-  font-size:28px;
-  letter-spacing:-0.5px;
-}
-.tagline{ margin:6px 0 18px; color:var(--muted) }
+.header h1{ margin:0; font-size:28px; }
+.tagline{ margin:6px 0 12px; color:var(--muted) }
 
-.controls{
-  display:flex;
-  gap:12px;
-  align-items:center;
-  margin-bottom:18px;
-  flex-wrap:wrap;
-}
+.auth-area{ display:flex; gap:8px; align-items:center; margin-top:8px; }
+.avatar{ width:36px; height:36px; border-radius:50%; margin-right:8px; vertical-align:middle }
 
-select{
-  padding:8px 10px;
-  border-radius:8px;
-  border:1px solid #e6e9ef;
-  background:white;
-}
+.controls{ display:flex; gap:12px; align-items:center; margin-bottom:18px; flex-wrap:wrap; }
+select{ padding:8px 10px; border-radius:8px; border:1px solid #e6e9ef; background:white; }
 
 .btn{
-  padding:9px 14px;
-  border-radius:10px;
-  border: none;
-  background:var(--card);
-  box-shadow:var(--shadow);
-  cursor:pointer;
-  transition:transform .08s ease;
+  padding:9px 14px; border-radius:10px; border:none; background:var(--card);
+  box-shadow:var(--shadow); cursor:pointer;
 }
 .btn:hover{ transform:translateY(-2px) }
-.btn.primary{
-  background:var(--accent);
-  color:white;
-}
-.btn.ghost{
-  background:transparent;
-  border:1px solid #e6e9ef;
-}
+.btn.primary{ background:var(--accent); color:white; }
+.btn.ghost{ background:transparent; border:1px solid #e6e9ef; }
+.actions{ display:flex; gap:10px; margin-top:12px; align-items:center; }
 
-.quiz-area{
-  display:block;
-  margin-top:12px;
-}
+.quiz-area{ margin-top:12px; }
 
 .card{
-  background:var(--card);
-  border-radius:var(--radius);
-  padding:16px;
-  margin-bottom:14px;
-  box-shadow:var(--shadow);
-  border:1px solid #eef2ff;
+  background:var(--card); border-radius:var(--radius); padding:16px; margin-bottom:14px;
+  box-shadow:var(--shadow); border:1px solid #eef2ff;
 }
 
 .question-meta{ font-size:13px; color:var(--muted); margin-bottom:8px }
-
-fieldset{ border:0; padding:0; margin:0 }
 legend{ font-weight:600; margin-bottom:10px; font-size:16px }
-
 .options{ display:flex; flex-direction:column; gap:8px }
-.option{
-  display:flex;
-  align-items:flex-start;
-  gap:8px;
-  padding:8px 10px;
-  border-radius:8px;
-  border:1px solid #f1f5f9;
-}
-.option.correct{
-  border-color: rgba(16,185,129,0.25);
-  background: rgba(16,185,129,0.06);
-}
-.option.wrong{
-  border-color: rgba(239,68,68,0.12);
-  background: rgba(239,68,68,0.04);
-}
-.option > label{ user-select:none; cursor:pointer; display:block }
+.option{ display:flex; align-items:flex-start; gap:8px; padding:8px 10px; border-radius:8px; border:1px solid #f1f5f9; }
+.option.correct{ border-color: rgba(16,185,129,0.25); background: rgba(16,185,129,0.06); }
+.option.wrong{ border-color: rgba(239,68,68,0.12); background: rgba(239,68,68,0.04); }
+.explanation{ margin-top:10px; padding:10px; border-radius:8px; background:#f8fafc; color:var(--muted); font-size:14px; }
 
-.explanation{
-  margin-top:10px;
-  padding:10px;
-  border-radius:8px;
-  background:#f8fafc;
-  color:var(--muted);
-  font-size:14px;
-}
-
-.result-bar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:10px;
-}
-
-.score{
-  font-weight:700;
-  font-size:18px;
-}
+.result-bar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.score{ font-weight:700; font-size:18px; }
 
 .footer{ margin-top:20px; color:var(--muted); font-size:13px }
 
 @media (max-width:640px){
   .controls{ flex-direction:column; align-items:stretch }
-  .actions{ display:flex; gap:8px; margin-top:12px; }
 }
