@@ -1,0 +1,56 @@
+[
+  {
+    "id": "tmua-sample-1",
+    "exam": "TMUA",
+    "year": 2021,
+    "question": "If f(x)=2x+3, what is f(4)?",
+    "options": ["7","8","11","12"],
+    "answer": 2,
+    "explanation": "f(4)=2*4+3=8+3=11, which is option C."
+  },
+  {
+    "id": "esat-sample-1",
+    "exam": "ESAT",
+    "year": 2018,
+    "question": "Which number is a prime?",
+    "options": ["4","9","11","21"],
+    "answer": 2,
+    "explanation": "11 is prime; 4,9,21 are composite."
+  },
+  {
+    "id": "sat-sample-1",
+    "exam": "SAT",
+    "year": 2019,
+    "question": "Simplify: 3(2x - 4) - 6",
+    "options": ["6x - 18","6x - 12","6x - 6","6x - 24"],
+    "answer": 1,
+    "explanation": "3(2x - 4) - 6 = 6x -12 -6 = 6x -18 (option A)."
+  },
+  {
+    "id": "tmua-sample-2",
+    "exam": "TMUA",
+    "year": 2020,
+    "question": "If a sequence starts 2, 5, 10, 17, what is the next term?",
+    "options": ["24","26","27","28"],
+    "answer": 3,
+    "explanation": "Differences: 3,5,7, next difference 9 => 17+9=26 (option B) -- (NOTE: sample depends on intended pattern)."
+  },
+  {
+    "id": "sat-sample-2",
+    "exam": "SAT",
+    "year": 2017,
+    "question": "Which of the following is an even integer?",
+    "options": ["15","-8","7","21"],
+    "answer": 1,
+    "explanation": "-8 is even."
+  },
+  {
+    "id": "esat-sample-2",
+    "exam": "ESAT",
+    "year": 2022,
+    "question": "What is 12 ÷ 3 × (2 + 1)?",
+    "options": ["4","12","36","3"],
+    "answer": 1,
+    "explanation": "Follow order: (2+1)=3; 12 ÷ 3 = 4; 4 × 3 = 12."
+  }
+]

@@ -1,398 +1,43 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="/images/logom.png">
-    <title>Mercia Robotics</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
-
-    <style>
-       
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MatLib — practice multi-choice admissions questions</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <!-- Epic Background -->
-    <div class="neural-background"></div>
-    
-    <!-- Floating Geometric Shapes -->
-    <div class="geometric-shapes">
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-    </div>
-
-    <!-- Lines -->
-    <div class="neural-lines">
-        <div class="neural-line"></div>
-        <div class="neural-line"></div>
-        <div class="neural-line"></div>
-    </div>
-
-    <!-- Header -->
-    <header class="glass">
-        <nav>
-            <a href="#home" class="logo">
-                <svg class="logo-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mercia Robotics logo">
-                    <defs>
-                        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#e0a3ff"/>
-                            <stop offset="50%" stop-color="#ff69b4"/>
-                            <stop offset="100%" stop-color="#9370db"/>
-                        </linearGradient>
-                    </defs>
-
-                    <!-- use <image> to embed a raster logo inside the svg -->
-                    <image href="images/logos.png" x="0" y="0" width="100" height="100" preserveAspectRatio="xMidYMid slice" />
-                </svg>
-
-                <span class="logo-text">MERCIA ROBOTICS</span>
-            </a>
-
-            <ul class="nav-links">
-                <li><a href="#features">About us</a></li>
-                <li><a href="#showcase">Team</a></li>
-                <li><a href="#timeline">Timeline</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li><a href="https://instagram.com/merciarobotics" target="_blank" class="external-link">INSTAGRAM</a></li>
-</ul>
-            </ul>
-            <div class="mobile-menu-toggle">
-                <div class="hamburger-line"></div>
-                <div class="hamburger-line"></div>
-                <div class="hamburger-line"></div>
-            </div>
-        </nav>
-        <div class="mobile-nav">
-            <a href="#features">About us</a>
-            <a href="#showcase">Team</a>
-            <a href="#timeline">Timeline</a>
-            <a href="#contact">Contact</a>
-            <a href="https://instagram.com/merciarobotics" target="_blank" class="external-link">INSTAGRAM</a>
-        </div>
+  <main class="container">
+    <header class="header">
+      <h1>MatLib</h1>
+      <p class="tagline">Random 5-question practice from UK admissions & SAT-style tests</p>
     </header>
 
-    <!-- Section 1: Hero -->
-    <section class="hero" id="home">
-        <div class="hero-content">
-            <div class="hero-subtitle">More Than Robots</div>
-            <h1>MERCIA ROBOTICS</h1>
-            
-            <div class="hero-description">
-                <p>Mercia Robotics is the FIRST Tech Challenge (FTC) team from Mercia School. Our students learn engineering, coding, and teamwork by designing competitive robots. We compete in the annual FTC challenge and also run outreach sessions to inspire younger students.</p>
-            </div>
+    <section class="controls">
+      <label for="examSelect">Choose exam:</label>
+      <select id="examSelect">
+        <option value="all">All exams (random)</option>
+        <option value="TMUA">TMUA</option>
+        <option value="ESAT">ESAT</option>
+        <option value="SAT">SAT</option>
+      </select>
 
-            <div class="cta-buttons">
-                <a href="#contact" class="cta-button">Become a Supporter</a>
-                <a href="team.html" class="cta-button secondary">learn about robots</a>
-            </div>
-
-            <!-- <div class="hero-stats">
-                <div class="hero-stat">
-                    <span class="hero-stat-number">16</span>
-                    <span class="hero-stat-label">students</span>
-                </div>
-                <div class="hero-stat">
-                    <span class="hero-stat-number">∞</span>
-                    <span class="hero-stat-label">blitzing</span>
-                </div>
-                <div class="hero-stat">
-                    <span class="hero-stat-number">6</span>
-                    <span class="hero-stat-label">coding team members</span>
-                </div>
-                <div class="hero-stat">
-                    <span class="hero-stat-number">3</span>
-                    <span class="hero-stat-label">CAD team members</span>
-                </div>
-            </div> -->
-            
-        </div>
+      <button id="loadBtn" class="btn">Load 5 questions</button>
+      <button id="shuffleBtn" class="btn ghost">Shuffle new 5</button>
     </section>
 
-    <!-- Section 2: Diagonal Features -->
-    <section class="features" id="features">
-        <div class="features-container">
-            <h2 class="section-title">About Us</h2>
-            <div class="diagonal-grid">
-                <div class="feature-row">
-                    <div class="feature-content glass">
-                        <div class="feature-icon">🔶</div>
-                        <h3>OUR MISSION</h3>
-                        <p>FIRST (For Inspiration and Recognition of Science and Technology) is a prestigious international program founded in 1989 to ignite scientific curiosity and innovation. This year, our team of 17 driven young adults will compete against over 60 teams from across the UK to design and build an autonomous robot over the course of 9 months — culminating in a high-stakes national challenge in London.</p>
-                    </div>
-                    <div class="feature-visual glass"></div>
-                </div>
-                
-                <div class="feature-row">
-                    <div class="feature-content glass">
-                        <div class="feature-icon">🏫</div>
-                        <h3>OUR SCHOOL</h3>
-                        <p>At Mercia, we’ve built a reputation for excellence in robotics. Our team has earned awards, nominations, and recognition through years of dedication and performance. This season, we’re proud to field a well-balanced group of scholars, each bringing exceptional talent in coding, engineering, design, media, and outreach. While our skills are diverse, we’re united by a shared passion for science and a relentless drive to solve complex problems creatively.</p>
-                    </div>
-                    <div class="feature-visual glass"></div>
-                </div>
-                
-                <div class="feature-row">
-                    <div class="feature-content glass">
-                        <div class="feature-icon">⚡</div>
-                        <h3>SPONSERING US</h3>
-                        <p>By sponsoring us, you’re not just supporting a team — you’re investing in the next generation of innovators. Your brand will be promoted at the regional competition in London (where we qualified last year) and at the European premier event in Eindhoven, Netherlands (which we’re ambitiously targeting this season). Your logo will appear on our team shirts, worn proudly throughout the season, and across our active social media platforms including Instagram and TikTok — where we’ll feature your products in short promotional videos and branded content.</p>
-                    </div>
-                    <div class="feature-visual glass"></div>
-                </div>
+    <section id="quizArea" class="quiz-area" aria-live="polite"></section>
 
-                <div class="feature-row">
-                    <div class="feature-content glass">
-                        <div class="feature-icon">🌐</div>
-                        <h3>OUR WEBSITE</h3>
-                        <p>You’ll also be showcased on our team website, which we’re designing ourselves, and publicly thanked at every competition we attend. It’s a chance to align your brand with education, creativity, and real-world impact — while helping young minds reach their full potential.
-
-Together, we can build something extraordinary.</p>
-                    </div>
-                    <div class="feature-visual glass"></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Section 3: Hexagonal Showcase -->
-    <section class="showcase" id="showcase">
-        <h2 class="section-title">Our Team</h2>
-        <div class="hexagon-container">
-            <div class="hexagon">
-                <div class="hexagon-inner glass">
-                    <div class="hexagon-icon">🔮</div>
-                    <h4>Oscar</h4>
-                    <p>SlaavE</p>
-                </div>
-            </div>
-            <div class="hexagon">
-                <div class="hexagon-inner glass">
-                    <div class="hexagon-icon">🔶</div>
-                    <h4>Xin</h4>
-                    <p>CAD</p>
-                </div>
-            </div>
-            <div class="hexagon">
-                <div class="hexagon-inner glass">
-                    <div class="hexagon-icon">🚀</div>
-                    <h4>Charlotte</h4>
-                    <p>ooooh</p>
-                </div>
-            </div>
-            <div class="hexagon">
-                <div class="hexagon-inner glass">
-                    <div class="hexagon-icon">🖨️</div>
-                    <h4>Talya</h4>
-                    <p>davis</p>
-                </div>
-            </div>
-            <div class="hexagon">
-                <div class="hexagon-inner glass">
-                    <div class="hexagon-icon">👷</div>
-                    <h4>Kayla</h4>
-                    <p>ssss</p>
-                </div>
-            </div>
-            <div class="hexagon">
-                <div class="hexagon-inner glass">
-                    <div class="hexagon-icon">🖥️</div>
-                    <h4>Maya</h4>
-                    <p>coding team</p>
-                </div>
-            </div>
-            <div class="hexagon">
-                <div class="hexagon-inner glass">
-                    <div class="hexagon-icon">🖥️</div>
-                    <h4>Blake</h4>
-                    <p>coding team</p>
-                </div>
-            </div>
-            <div class="hexagon">
-                <div class="hexagon-inner glass">
-                    <div class="hexagon-icon">🖥️</div>
-                    <h4>Ben</h4>
-                    <p>coding team</p>
-                </div>
-            </div>
-            <div class="hexagon">
-                <div class="hexagon-inner glass">
-                    <div class="hexagon-icon">🖥️</div>
-                    <h4>Edward</h4>
-                    <p>coding team</p>
-                </div>
-            </div>
-            <div class="hexagon">
-                <div class="hexagon-inner glass">
-                    <div class="hexagon-icon">🖥️</div>
-                    <h4>Jacob</h4>
-                    <p>coding team</p>
-                </div>
-            </div>
-            <div class="hexagon">
-                <div class="hexagon-inner glass">
-                    <div class="hexagon-icon">🖥️</div>
-                    <h4>Amin</h4>
-                    <p>coding team</p>
-                </div>
-            </div>
-            <div class="hexagon">
-                <div class="hexagon-inner glass">
-                    <div class="hexagon-icon">🖥️</div>
-                    <h4>Theo</h4>
-                    <p>coding team</p>
-                </div>
-            </div>
-            <div class="hexagon">
-                <div class="hexagon-inner glass">
-                    <div class="hexagon-icon">🖥️</div>
-                    <h4>Kamil</h4>
-                    <p>coding team</p>
-                </div>
-            </div>
-            <div class="hexagon">
-                <div class="hexagon-inner glass">
-                    <div class="hexagon-icon">🖥️</div>
-                    <h4>Alfie</h4>
-                    <p>coding team</p>
-                </div>
-            </div>
-            <div class="hexagon">
-                <div class="hexagon-inner glass">
-                    <div class="hexagon-icon">🖥️</div>
-                    <h4>Nazar</h4>
-                    <p>coding team</p>
-                </div>
-            </div>
-            <div class="hexagon">
-                <div class="hexagon-inner glass">
-                    <div class="hexagon-icon">🖥️</div>
-                    <h4>Jeremiah</h4>
-                    <p>coding team</p>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    
-
-
-
-
-    <!-- Section 4: Timeline -->
-    <section class="timeline" id="timeline">
-        <h2 class="section-title">TIMELINE</h2>
-        <div class="timeline-container">
-            <div class="timeline-line"></div>
-            
-            <div class="timeline-item">
-                <div class="timeline-content glass">
-                    <div class="timeline-year">NOV 2025</div>
-                    <h4>Scrimmage</h4>
-                    <p>...</p>
-                </div>
-                <div class="timeline-dot"></div>
-            </div>
-            
-            <div class="timeline-item">
-                <div class="timeline-content glass">
-                    <div class="timeline-year">2026</div>
-                    <h4>Regional</h4>
-                    <p>South Yorkshire</p>
-                </div>
-                <div class="timeline-dot"></div>
-            </div>
-            
-            <div class="timeline-item">
-                <div class="timeline-content glass">
-                    <div class="timeline-year">2026</div>
-                    <h4>National</h4>
-                    <p>LONDON</p>
-                </div>
-                <div class="timeline-dot"></div>
-            </div>
-            
-            <div class="timeline-item">
-                <div class="timeline-content glass">
-                    <div class="timeline-year">2026</div>
-                    <h4>International</h4>
-                    <p>...</p>
-                </div>
-                <div class="timeline-dot"></div>
-            </div>
-        </div>
-    </section>
-
-
-    <section class="sponsor-scroller">
-    <h3 class="scroller-title">OUR SPONSORS</h3>
-
-    <div class="sponsor-viewport" id="sponsorViewport">
-        <div class="sponsor-track" id="sponsorTrack">
-        <!-- Put logos ONCE here -->
-        <img src="images/accu.png" alt="Sponsor 1">
-        <img src="images/accu.png" alt="Sponsor 2">
-        <img src="images/accu.png" alt="Sponsor 3">
-        <img src="images/accu.png" alt="Sponsor 4">
-        <img src="images/accu.png" alt="Sponsor 5">
-        </div>
+    <div class="actions">
+      <button id="submitBtn" class="btn primary" disabled>Submit answers</button>
+      <button id="nextBtn" class="btn" hidden>New set</button>
     </div>
-    </section>
 
-
-    <!-- Section 5: Contact -->
-    <section class="contact" id="contact">
-        <div class="contact-container">
-            <div class="contact-info glass">
-                <h3>SPONSORSHIP</h3>
-                <p>Join us in shaping the future of STEM by supporting Mercia Robotics. Your sponsorship helps students gain hands-on experience in science, technology, engineering, and maths — building skills that last a lifetime.</p>
-                <p>We offer flexible sponsorship tiers, with opportunities to make a meaningful impact in your community. If you're a top-rate income tax payer, you could receive up to 45% tax relief on your donation — making your support even more powerful.</p>
-                
-                <div class="social-links">
-                    <a href="https://instagram.com/merciarobotics" class="glass">🖼️</a>
-                    <a href="mailto:stelmachmh@school.com?subject=Inquiry" class="glass">💬</a>
-                    <a href="mailto:merciarobotics@gmail.com?subject=Inquiry" class="glass">📨</a>
-                </div>
-            </div>
-            
-            <div class="contact-info glass">
-                <h3>DONATION</h3>
-                <p>🚀 Back the Future of STEM with Mercia Robotics! Your sponsorship puts real tools in students’ hands — funding kits, competitions, travel and mentorship. In return, you gain 🎯 local brand exposure, 📢 positive community recognition, and 💡 unique staff engagement opportunities.</p>
-                <p>🌟Every pound you give fuels innovation, inspires young engineers, and could even qualify for tax relief.👉 Click Donate or use the contact form today — and be the reason the next generation of problem-solvers takes flight.</p>
-                <button type="submit" class="submit-btn">DONATE</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-links">
-                <a href="#features">About Us</a>
-                <a href="#showcase">Team</a>
-                <a href="https://instagram.com/merciarobotics" target="_blank" rel="noopener">Instagram</a>
-    			<a href="https://github.com/merciarobotics" target="_blank" rel="noopener">GitHub</a>
-            </div>
-            <div class="footer-copyright">
-                <p>&copy; <span id="year"></span> Mercia Robotics — Mercia School. Made with love ❤️</p>
-            </div>
-            <div class="footer-design">
-                Design: <a href="" target="_blank" rel="nofollow noopener">mercia robotics</a> | 
-                 
-                <a href="#">mercia school</a>
-            </div>
-        </div>
+    <footer class="footer">
+      <small>Designed for practice — be sure to respect exam copyright when uploading official content.</small>
     </footer>
-<script src="script.js"></script>
+  </main>
+
+  <script src="app.js" type="module"></script>
 </body>
 </html>
-
-
-
-
-
