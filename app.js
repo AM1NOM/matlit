@@ -1,7 +1,4 @@
-// app.js (module)
-// Main MatLib site: Firebase Auth + quiz UI
 
-// Firebase SDK (v10) imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getAuth,
@@ -10,6 +7,18 @@ import {
   signOut,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+// add to your existing firestore imports
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  setDoc,
+  updateDoc,
+  serverTimestamp,
+  increment
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
   getFirestore,
   collection,
@@ -30,6 +39,11 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 const db = getFirestore(app);
+
+// state for wrong-answers tracking
+let userWrongSet = new Set();     // question IDs the user previously got wrong
+let userWrongMap = new Map();     // questionId -> metadata (count, lastWrong)
+
 
 // DOM
 const loginBtn = document.getElementById('loginBtn');
@@ -67,17 +81,16 @@ logoutBtn.addEventListener('click', async () => {
   await signOut(auth);
 });
 
-onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   if (user) {
-    loginBtn.style.display = 'none';
-    userInfo.style.display = 'inline-flex';
-    userPic.src = user.photoURL || '';
-    userName.textContent = user.displayName || user.email || '';
-    logoutBtn.style.display = 'inline-block';
+    // existing UI updates...
+    await fetchUserWrongSet(user.uid);    // <-- add this
+    // if you already have a quiz loaded, re-render to show highlights:
+    if (currentSet && currentSet.length) renderQuiz(currentSet);
   } else {
-    loginBtn.style.display = 'inline-block';
-    userInfo.style.display = 'none';
+    userWrongSet.clear();
+    userWrongMap.clear();
   }
 });
 
@@ -90,6 +103,78 @@ function shuffle(arr) {
   }
   return a;
 }
+
+// Fetch current user's wrong questions and fill userWrongSet & userWrongMap
+async function fetchUserWrongSet(uid) {
+  userWrongSet.clear();
+  userWrongMap.clear();
+  try {
+    const coll = collection(db, 'users', uid, 'wrong_questions');
+    const snapshot = await getDocs(coll);
+    snapshot.forEach(docSnap => {
+      const qid = docSnap.id;
+      const data = docSnap.data();
+      userWrongSet.add(qid);
+      userWrongMap.set(qid, {
+        count: data.count ?? 0,
+        lastWrong: data.lastWrong ?? null,
+        lastCorrect: data.lastCorrect ?? null
+      });
+    });
+  } catch (err) {
+    console.error('Failed to fetch user wrong set', err);
+  }
+}
+
+// Save a wrong answer (increment counter). Creates the doc if missing.
+async function saveWrongQuestion(uid, question) {
+  if (!uid || !question?.id) return;
+  const qid = question.id;
+  const docRef = doc(db, 'users', uid, 'wrong_questions', qid);
+  try {
+    // Try update (increment). If it fails because doc doesn't exist, fallback to set.
+    await updateDoc(docRef, {
+      count: increment(1),
+      lastWrong: serverTimestamp(),
+      questionSnapshot: question.question ?? ''
+    });
+  } catch (err) {
+    // If update failed because the doc doesn't exist, create it
+    try {
+      await setDoc(docRef, {
+        count: 1,
+        lastWrong: serverTimestamp(),
+        questionSnapshot: question.question ?? ''
+      });
+    } catch (e) {
+      console.error('Failed to set wrong question doc', e);
+    }
+  }
+  // Update local caches for immediate UI feedback
+  userWrongSet.add(qid);
+  const prev = userWrongMap.get(qid) || { count: 0 };
+  userWrongMap.set(qid, { ...prev, count: (prev.count || 0) + 1, lastWrong: new Date() });
+}
+
+// Optionally mark question as corrected (set lastCorrect). If you want to remove from wrong set, delete doc.
+async function markQuestionCorrect(uid, question) {
+  if (!uid || !question?.id) return;
+  const qid = question.id;
+  const docRef = doc(db, 'users', uid, 'wrong_questions', qid);
+  try {
+    // write lastCorrect; keep count
+    await updateDoc(docRef, {
+      lastCorrect: serverTimestamp()
+    });
+    // Optionally remove from user's wrong set locally but keep history
+    userWrongSet.delete(qid);
+    const meta = userWrongMap.get(qid) || {};
+    userWrongMap.set(qid, { ...meta, lastCorrect: new Date() });
+  } catch (err) {
+    // if doc doesn't exist, nothing to mark
+  }
+}
+
 
 // load questions JSON
 async function loadQuestions() {
@@ -125,6 +210,28 @@ function renderQuiz(questions) {
     const card = document.createElement('section');
     card.className = 'card';
     card.dataset.qid = q.id ?? `q-${idx}`;
+
+    // --- Previously-missed badge (inserted immediately after card creation) ---
+    try {
+      if (currentUser && q.id && typeof userWrongSet !== 'undefined' && userWrongSet.has(q.id)) {
+        card.classList.add('previously-wrong');
+
+        const meta = userWrongMap.get(q.id) || {};
+        const count = meta.count || 0;
+
+        const badge = document.createElement('div');
+        badge.className = 'score-badge';
+        badge.textContent = `Previously missed (${count})`;
+        badge.style.fontSize = '12px';
+        badge.style.color = '#b91c1c';
+        badge.style.marginBottom = '6px';
+
+        card.appendChild(badge);
+      }
+    } catch (err) {
+      // defensive: if userWrongMap/userWrongSet not available, fail silently
+      console.error('Error checking previous wrong set:', err);
+    }
 
     const meta = document.createElement('div');
     meta.className = 'question-meta';
@@ -184,15 +291,21 @@ function renderQuiz(questions) {
   });
 }
 
-function grade() {
+
+async function grade() {
   const cards = Array.from(quizArea.querySelectorAll('.card'));
   let correctCount = 0;
+
+  // Collect questions to update in Firestore
+  const wrongQs = [];
+  const correctedQs = [];
 
   cards.forEach((card, idx) => {
     const q = currentSet[idx];
     const selected = card.querySelector('input[type=radio]:checked');
     const explanation = card.querySelector('.explanation');
 
+    // clear old state
     card.querySelectorAll('.option').forEach(el => {
       el.classList.remove('correct', 'wrong');
     });
@@ -205,14 +318,26 @@ function grade() {
       const chosenIndex = parseInt(selected.value, 10);
       if (chosenIndex === correctIndex) {
         correctCount += 1;
+        // if previously missed, mark as corrected
+        if (currentUser && q.id && userWrongSet && userWrongSet.has(q.id)) {
+          correctedQs.push(q);
+        }
       } else {
         const chosenEl = card.querySelector(`.option[data-index="${chosenIndex}"]`);
         if (chosenEl) chosenEl.classList.add('wrong');
+        // record wrong question
+        if (currentUser && q.id) wrongQs.push(q);
       }
+    } else {
+      // no answer selected -> treat as wrong (you can change this behavior)
+      if (currentUser && q.id) wrongQs.push(q);
     }
-    explanation.style.display = 'block';
+
+    // reveal explanation
+    if (explanation) explanation.style.display = 'block';
   });
 
+  // update UI
   submitBtn.disabled = true;
   nextBtn.hidden = false;
   saveScoreBtn.hidden = !currentUser;
@@ -226,7 +351,48 @@ function grade() {
 
   // attach score to save button dataset
   saveScoreBtn.dataset.score = correctCount;
+
+  // persist wrong/correct updates for the signed-in user
+  if (currentUser) {
+    const uid = currentUser.uid;
+    const ops = [];
+
+    // Save wrong questions (increment count)
+    for (const wq of wrongQs) {
+      // call helper; push promise and catch to avoid unhandled rejections
+      ops.push(
+        saveWrongQuestion(uid, wq).catch(err => {
+          console.error('Failed to save wrong question', wq.id, err);
+        })
+      );
+    }
+
+    // Mark corrected questions (if they were previously missed)
+    for (const cq of correctedQs) {
+      ops.push(
+        markQuestionCorrect(uid, cq).then(() => {
+          // update local cache immediately so UI reflects change if you re-render
+          try {
+            userWrongSet.delete(cq.id);
+            const prev = userWrongMap.get(cq.id) || {};
+            userWrongMap.set(cq.id, { ...prev, lastCorrect: new Date() });
+          } catch (e) { /* ignore */ }
+        }).catch(err => {
+          console.error('Failed to mark question correct', cq.id, err);
+        })
+      );
+    }
+
+    // wait for all writes to settle (non-fatal)
+    try {
+      await Promise.allSettled(ops);
+    } catch (e) {
+      // shouldn't reach here because we used allSettled, but keep defensive logging
+      console.error('Unexpected error while saving question results', e);
+    }
+  }
 }
+
 
 loadBtn.addEventListener('click', async () => {
   try {
