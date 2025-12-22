@@ -79,11 +79,28 @@ logoutBtn.addEventListener('click', async () => {
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   if (user) {
-    // existing UI updates...
-    await fetchUserWrongSet(user.uid);    // <-- add this
+    // show user info in the UI
+    try {
+      loginBtn.style.display = 'none';
+      userInfo.style.display = 'flex';
+      userPic.src = user.photoURL || '';
+      userPic.alt = user.displayName || user.email || 'User avatar';
+      userName.textContent = user.displayName || user.email || '';
+    } catch (e) { /* ignore UI update errors */ }
+
+    await fetchUserWrongSet(user.uid);
     // if you already have a quiz loaded, re-render to show highlights:
     if (currentSet && currentSet.length) renderQuiz(currentSet);
   } else {
+    // signed out — clear UI
+    try {
+      loginBtn.style.display = '';
+      userInfo.style.display = 'none';
+      userPic.src = '';
+      userPic.alt = '';
+      userName.textContent = '';
+    } catch (e) { /* ignore */ }
+
     userWrongSet.clear();
     userWrongMap.clear();
   }
@@ -284,6 +301,21 @@ function renderQuiz(questions) {
 
     quizArea.appendChild(card);
   });
+
+  // render math (KaTeX) for any LaTeX in the generated content
+  try {
+    if (window.renderMathInElement) {
+      window.renderMathInElement(quizArea, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '$', right: '$', display: false }
+        ],
+        throwOnError: false
+      });
+    }
+  } catch (e) {
+    console.error('KaTeX render error', e);
+  }
 }
 
 
