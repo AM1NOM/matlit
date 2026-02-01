@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MatLib — Profile</title>
+  <link rel="stylesheet" href="profile.css" />
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>Your Profile</h1>
+      <div id="userArea" class="user-area">
+        <img id="userPic" class="avatar" alt="" />
+        <div>
+          <div id="userName" class="user-name"></div>
+          <div id="userEmail" class="user-email"></div>
+        </div>
+      </div>
+    </header>
+
+    <section class="controls">
+      <label>Filter:
+        <select id="filterSelect">
+          <option value="all">All</option>
+          <option value="still">Still missed</option>
+          <option value="corrected">Corrected</option>
+        </select>
+      </label>
+
+      <button id="exportBtn" class="btn">Export JSON</button>
+      <button id="clearAllBtn" class="btn danger">Clear all</button>
+    </section>
+
+    <section id="listArea" class="card">
+      <div id="loading">Loading your history…</div>
+      <div id="list" style="display:none"></div>
+    </section>
+
+    <footer>
+      <small>Data stored in Firestore under <code>users/{uid}/wrong_questions</code>.</small>
+    </footer>
+  </main>
+
+  <script type="module" src="profile.js"></script>
+</body>
+</html>
