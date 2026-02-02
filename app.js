@@ -78,6 +78,7 @@ logoutBtn.addEventListener('click', async () => {
 
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
+  window.currentUser = user;
   if (user) {
     // show user info in the UI
     try {
