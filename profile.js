@@ -23,10 +23,10 @@ import {
  remove the initializeApp call below and instead import/get the existing app.
 ========================= */
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDSdCPIO_QJHPv6sDX5hjWujiaNvtEYD8w",
+  authDomain: "matlit-8e3e4.firebaseapp.com",
+  projectId: "matlit-8e3e4",
+  appId: "1:233226171822:web:b792ddb8510b2ec33dc43f"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -195,3 +195,4 @@ onAuthStateChanged(auth, user => {
     renderList();
   }
 });
+
