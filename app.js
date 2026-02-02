@@ -185,7 +185,7 @@ async function fetchUserWrongSet(uid) {
 // Save a wrong answer (increment counter). Creates the doc if missing.
 async function saveWrongQuestion(uid, question) {
   if (!uid || !question?.id) return;
-  const qid = question.id;
+  const qid = String(question.id);
   const docRef = doc(db, 'users', uid, 'wrong_questions', qid);
   try {
     // Try update (increment). If it fails because doc doesn't exist, fallback to set.
@@ -215,7 +215,7 @@ async function saveWrongQuestion(uid, question) {
 // Optionally mark question as corrected (set lastCorrect). If you want to remove from wrong set, delete doc.
 async function markQuestionCorrect(uid, question) {
   if (!uid || !question?.id) return;
-  const qid = question.id;
+  const qid = String(question.id);
   const docRef = doc(db, 'users', uid, 'wrong_questions', qid);
   try {
     // write lastCorrect; keep count
