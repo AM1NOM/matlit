@@ -1,7 +1,5 @@
 // timed.js (module)
-// Timed quiz page: deterministic 10-question quizzes keyed by 4-letter token.
-// Requirements: place in same folder as questions.json and styles.css
-
+// Timed quiz page with KaTeX support and exam filter
 const QUESTIONS_URL = 'questions.json';
 const QUIZ_SIZE = 10;
 const DURATION_MS = 10 * 60 * 1000; // 10 minutes
@@ -17,6 +15,7 @@ const quizArea = document.getElementById('quizArea');
 const submitBtn = document.getElementById('submitBtn');
 const restartBtn = document.getElementById('restartBtn');
 const modeSelect = document.getElementById('modeSelect');
+const examSelect = document.getElementById('examSelect');
 
 let allQuestions = [];
 let currentSet = [];
@@ -26,7 +25,6 @@ let timerInterval = null;
 
 // ----------------- utility: seeded RNG (mulberry32) -----------------
 function hashStringToSeed(s) {
-  // simple 32-bit hash from string
   let h = 2166136261 >>> 0;
   for (let i = 0; i < s.length; i++) {
     h ^= s.charCodeAt(i);
@@ -59,14 +57,20 @@ function randomToken() {
   for (let i = 0; i < 4; i++) t += letters[Math.floor(Math.random() * letters.length)];
   return t;
 }
-function setQueryToken(t) {
+function setQueryParams(t, exam) {
   const url = new URL(window.location.href);
-  url.searchParams.set('quiz', t);
+  if (t) url.searchParams.set('quiz', t);
+  else url.searchParams.delete('quiz');
+  if (exam && exam !== 'all') url.searchParams.set('exam', exam);
+  else url.searchParams.delete('exam');
   history.replaceState(null, '', url.toString());
 }
-function getQueryToken() {
+function getQueryParams() {
   const url = new URL(window.location.href);
-  return url.searchParams.get('quiz');
+  return {
+    quiz: url.searchParams.get('quiz'),
+    exam: url.searchParams.get('exam')
+  };
 }
 
 // ----------------- Loading questions -----------------
@@ -79,17 +83,55 @@ async function loadQuestions() {
     ...q,
     id: q.id != null ? String(q.id) : `${q.exam ?? 'Q'}-${q.year ?? '0'}-${idx}`
   }));
+
+  populateExamFilter();
 }
 
-// ----------------- pick questions deterministically from token -----------------
-function questionsForToken(t) {
-  // produce seed from token string
-  const seed = hashStringToSeed(t);
-  const shuffled = seededShuffle(allQuestions, seed);
+// populate exam dropdown with dynamic list plus "All"
+function populateExamFilter() {
+  const exams = Array.from(new Set(allQuestions.map(q => q.exam).filter(Boolean))).sort();
+  // clear existing (except the first "all" option)
+  examSelect.querySelectorAll('option:not([value="all"])').forEach(o => o.remove());
+  exams.forEach(ex => {
+    const opt = document.createElement('option');
+    opt.value = ex;
+    opt.textContent = ex;
+    examSelect.appendChild(opt);
+  });
+
+  // if exam param exists in URL, set it
+  const { exam } = getQueryParams();
+  if (exam) {
+    // if value not present, add it
+    if (![...examSelect.options].some(o => o.value === exam)) {
+      const opt = document.createElement('option');
+      opt.value = exam;
+      opt.textContent = exam;
+      examSelect.appendChild(opt);
+    }
+    examSelect.value = exam;
+  }
+}
+
+// ----------------- pick questions deterministically from token & exam -----------------
+function questionsForToken(t, exam = 'all') {
+  // produce seed from token string plus exam so token+exam -> same set
+  const seed = hashStringToSeed(`${t}|${exam}`);
+  // build pool based on exam filter
+  let pool = allQuestions;
+  if (exam && exam !== 'all') {
+    pool = allQuestions.filter(q => q.exam === exam);
+  }
+  // If the filtered pool is smaller than QUIZ_SIZE, fall back to "all" with a warning
+  if (pool.length < QUIZ_SIZE) {
+    console.warn(`Not enough questions for exam='${exam}' (found ${pool.length}). Using all exams.`);
+    pool = allQuestions;
+  }
+  const shuffled = seededShuffle(pool, seed);
   return shuffled.slice(0, QUIZ_SIZE);
 }
 
-// ----------------- rendering quiz (similar structure to main page) -----------------
+// ----------------- rendering quiz (with KaTeX rendering) -----------------
 function renderQuiz(questions) {
   quizArea.innerHTML = '';
   submitBtn.disabled = false;
@@ -155,6 +197,23 @@ function renderQuiz(questions) {
     card.appendChild(explanation);
     quizArea.appendChild(card);
   });
+
+  // LaTeX rendering: use KaTeX auto-render if available
+  try {
+    if (window.renderMathInElement) {
+      window.renderMathInElement(quizArea, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '$', right: '$', display: false },
+          { left: '\\(', right: '\\)', display: false },
+          { left: '\\[', right: '\\]', display: true }
+        ],
+        throwOnError: false
+      });
+    }
+  } catch (e) {
+    console.error('KaTeX render error', e);
+  }
 }
 
 // ----------------- timer helpers -----------------
@@ -166,7 +225,6 @@ function formatMs(ms) {
   return `${mm}:${ss}`;
 }
 function startTimerForToken(t) {
-  // startTs stored in localStorage under key 'timed_<token>'
   const key = `timed_${t}_start`;
   let ts = localStorage.getItem(key);
   if (!ts) {
@@ -188,19 +246,16 @@ function updateTimerUI() {
     clearInterval(timerInterval);
     timerInterval = null;
     timerEl.textContent = '00:00';
-    // time's up — reveal answers automatically
     revealAnswers();
   }
 }
 
 // ----------------- grader & reveal -----------------
 function revealAnswers() {
-  // show correct/wrong and explanations, and disable submit
   const cards = Array.from(quizArea.querySelectorAll('.card'));
   cards.forEach((card, idx) => {
     const q = currentSet[idx];
     const selected = card.querySelector('input[type=radio]:checked');
-    // clear old state
     card.querySelectorAll('.option').forEach(el => el.classList.remove('correct', 'wrong'));
     const correctIndex = q.answer;
     const correctOptionEl = card.querySelector(`.option[data-index="${correctIndex}"]`);
@@ -221,13 +276,12 @@ function revealAnswers() {
 
 // ----------------- create / open flow -----------------
 createBtn.addEventListener('click', async () => {
-  // create a new token and load questions
   if (!allQuestions.length) await loadQuestions();
+  const exam = examSelect.value || 'all';
   token = randomToken();
-  setQueryToken(token);
-  currentSet = questionsForToken(token);
+  setQueryParams(token, exam);
+  currentSet = questionsForToken(token, exam);
   renderQuiz(currentSet);
-  // start timer and show link
   startTimerForToken(token);
   shareArea.style.display = '';
   shareLinkEl.textContent = window.location.href;
@@ -247,14 +301,21 @@ copyBtn.addEventListener('click', async () => {
 
 // when visiting URL with ?quiz=XXXX open that token
 async function openFromUrlIfPresent() {
-  const t = getQueryToken();
-  if (!t) return;
-  token = t.toUpperCase().slice(0,4).replace(/[^A-Z]/g,'A'); // sanitize
+  const params = getQueryParams();
+  if (!params.quiz) return;
+  token = params.quiz.toUpperCase().slice(0,4).replace(/[^A-Z]/g,'A'); // sanitize
+  const examParam = params.exam || 'all';
   if (!allQuestions.length) await loadQuestions();
-  currentSet = questionsForToken(token);
+  // ensure examSelect includes this option and set it
+  if (![...examSelect.options].some(o => o.value === examParam)) {
+    const opt = document.createElement('option');
+    opt.value = examParam;
+    opt.textContent = examParam;
+    examSelect.appendChild(opt);
+  }
+  examSelect.value = examParam;
+  currentSet = questionsForToken(token, examParam);
   renderQuiz(currentSet);
-
-  // if a start time exists in localStorage, resume; otherwise set a start time now
   startTimerForToken(token);
   shareArea.style.display = '';
   shareLinkEl.textContent = window.location.href;
@@ -273,7 +334,6 @@ restartBtn.addEventListener('click', () => {
   if (!confirm('Restart this timed quiz (reset your local start time)?')) return;
   localStorage.removeItem(`timed_${token}_start`);
   startTimerForToken(token);
-  // reset UI selections
   const cards = Array.from(quizArea.querySelectorAll('.card'));
   cards.forEach(card => {
     card.querySelectorAll('input[type=radio]').forEach(i => i.checked = false);
@@ -289,14 +349,21 @@ restartBtn.addEventListener('click', () => {
 modeSelect.addEventListener('change', () => {
   const v = modeSelect.value;
   if (v === 'link') {
-    // show link from URL
-    const existing = getQueryToken();
+    const existing = getQueryParams().quiz;
     if (!existing) {
       alert('No quiz token in the URL. Create one or append ?quiz=ABCD to the URL.');
     } else {
-      // attempt open
       openFromUrlIfPresent();
     }
+  }
+});
+
+// change exam selection: if token exists and user changes exam, regenerate token? we keep token and set exam param only when creating
+examSelect.addEventListener('change', () => {
+  // If user changes exam while a quiz token is present, update the share link to include the exam.
+  if (token) {
+    setQueryParams(token, examSelect.value);
+    shareLinkEl.textContent = window.location.href;
   }
 });
 
