@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MatLib — Timed Quiz</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* small page-specific tweaks */
+    .timed-controls { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:12px; }
+    .shareLink { font-family: monospace; padding:6px 8px; background:#f3f4f6; border-radius:6px; }
+    .timer { font-weight:700; font-size:18px; color: #1f2937; margin-left:6px; }
+    .muted { color: #6b7280; font-size:13px; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <h1>MatLib — Timed Quiz</h1>
+      <p class="tagline">10-question timed quiz — 10 minutes. Create a shareable 4-letter link.</p>
+    </header>
+
+    <section class="timed-controls">
+      <label>Mode:
+        <select id="modeSelect">
+          <option value="new">Create new timed quiz</option>
+          <option value="link">Open by link</option>
+        </select>
+      </label>
+
+      <button id="createBtn" class="btn">Create 10-question quiz</button>
+
+      <div id="shareArea" style="display:none">
+        <span class="muted">Share link:</span>
+        <span id="shareLink" class="shareLink"></span>
+        <button id="copyBtn" class="btn ghost">Copy</button>
+      </div>
+
+      <div id="timerArea" style="display:none">
+        <span class="muted">Time left:</span>
+        <span id="timer" class="timer">10:00</span>
+      </div>
+    </section>
+
+    <section id="quizArea" class="quiz-area" aria-live="polite"></section>
+
+    <div class="actions">
+      <button id="submitBtn" class="btn primary" disabled>Submit / Reveal</button>
+      <button id="restartBtn" class="btn" hidden>Restart</button>
+    </div>
+
+    <footer class="footer">
+      <small>Note: the link token chooses a deterministic question set. Without a server the timer is local to each browser — see notes below.</small>
+    </footer>
+  </main>
+
+  <script type="module" src="timed.js"></script>
+</body>
+</html>
