@@ -296,8 +296,9 @@ function renderQuiz(questions) {
 
     const fieldset = document.createElement('fieldset');
     const legend = document.createElement('legend');
-    legend.textContent = `${idx + 1}. ${q.question}`;
+    legend.innerHTML = `${idx + 1}. ${q.question.replace(/\n/g, '<br>')}`;
     fieldset.appendChild(legend);
+
 
     const options = document.createElement('div');
     options.className = 'options';
