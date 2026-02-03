@@ -40,11 +40,11 @@
   "year": 2015,
   "question": "The perpendicular bisector of the line segment joining the points $(2, -6)$ and $(5, 4)$ cuts the $x$‐axis at the point with $x$‐coordinate",
   "options": [
-    "-\\frac{1}{20}",
-    "\\frac{1}{6}",
-    "\\frac{1}{3}",
-    "\\frac{19}{5}",
-    "\\frac{41}{6}"
+    "$-\\frac{1}{20}$",
+    "$\\frac{1}{6}$",
+    "$\\frac{1}{3}$",
+    "$\\frac{19}{5}$",
+    "$\\frac{41}{6}$"
   ],
   "answer": 1,
   "explanation": "We find the equation of the perpendicular bisector first, and then find the x-coordinate of this line when y = 0.\n\nThe midpoint of the line segment joining (2, -6) and (5, 4) is (7/2, -1), and the gradient of this line segment is 4 - (-6)/5 - 2 = 10/3.\n\nTherefore the perpendicular bisector passes through (7/2, -1) and has gradient -3/10. Its equation is therefore\n\n$$y - (-1) = -\\frac{3}{10}(x - \\frac{7}{2}).$$\n\nWe could expand and simplify this equation, but that is not necessary for our purposes. Instead, we substitute y = 0 to obtain\n\n$$1 = -\\frac{3}{10}(x - \\frac{7}{2})$$\n\ngiving\n\n$$x - \\frac{7}{2} = -\\frac{10}{3}$$\n\nso x = 7/2 - 10/3 = 21/6 - 20/6 = 1/6 showing that the correct answer is option B.",
