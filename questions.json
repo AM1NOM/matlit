@@ -330,5 +330,24 @@
   "answer": 6,
   "explanation": "We expand each of the terms up to the term in $x^2$ using the binomial theorem:\n\n$$(1 + 2x + 3x^2)^6 = 1 + 6(2x + 3x^2) + 15(2x + 3x^2)^2 + \\dots$$\n\n$$= 1 + 12x + 18x^2 + 15(4x^2 + \\dots) + \\dots$$\n\n$$= 1 + 12x + 78x^2 + \\dots$$\n\n$$(1 + 4x^3)^5 = 1 + 5(4x^3) + \\dots = 1 + \\dots$$\n\nso the whole expression is\n\n$$(4 - x^2)[(1 + 12x + 78x^2 + \\dots) - (1 + \\dots)]$$\n\n$$= (4 - x^2)(12x + 78x^2 + \\dots)$$\n\n$$= 48x + 312x^2 + \\dots$$\n\nso the coefficient of $x^2$ is 312, and the answer is G.",
   "image": null
+},
+{
+  "id": 176644331825722,
+  "exam": "SAT",
+  "year": "Standard English Conventions",
+  "question": "In 2018, a team of researchers led by Dr. Caitlin Whalen compiled every available measurement of ocean mixing rates from the past two decades. With this novel data set, the team was able to determine how current-driven mixing varies across ______blank and what impact it has on the distribution of heat and nutrients in the ocean.\n Which choice completes the text so that it conforms to the conventions of Standard English?",
+  "options": [
+    "regions",
+    "regions:",
+    "regions;",
+    "regions"
+  ],
+  "answer": 4,
+  "explanation": "Correct Answer: D
+
+\nChoice D is the best answer. The convention being tested is punctuation between coordinates in a sentence. The two elements \"how…regions\" and \"what…ocean\" work together as coordinates to complete the description of what the team was able to determine. Because there are only two coordinates in this case (as opposed to a series of three or more), no punctuation is needed between them.
+
+\nChoice A is incorrect because no punctuation is needed between the coordinates \"how…regions\" and \"what…ocean.\" Choice B is incorrect because no punctuation is needed between the coordinates \"how…regions\" and \"what…ocean.\" Choice C is incorrect because no punctuation is needed between the coordinates \"how…regions\" and \"what…ocean.\"",
+  "image": null
 }
 ]
