@@ -4,14 +4,20 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>MatLib — Timed Quiz</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="styles.css" />
   <style>
-    /* small page-specific tweaks */
+    /* page-specific tweaks */
     .timed-controls { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:12px; }
     .shareLink { font-family: monospace; padding:6px 8px; background:#f3f4f6; border-radius:6px; }
     .timer { font-weight:700; font-size:18px; color: #1f2937; margin-left:6px; }
     .muted { color: #6b7280; font-size:13px; }
+    .exam-filter { min-width:160px; }
   </style>
+
+  <!-- KaTeX (for LaTeX rendering) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
 </head>
 <body>
   <main class="container">
@@ -21,6 +27,13 @@
     </header>
 
     <section class="timed-controls">
+      <label>Exam:
+        <select id="examSelect" class="exam-filter">
+          <option value="all">All exams</option>
+          <!-- dynamic exam options will be inserted here -->
+        </select>
+      </label>
+
       <label>Mode:
         <select id="modeSelect">
           <option value="new">Create new timed quiz</option>
