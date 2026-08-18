@@ -13,9 +13,7 @@ app.add_middleware(
 )
 
 GENERATORS = {
-    "quadratics": quadratics.generate,
     "integration": integration.generate,
-    "logic": logic.generate,
 }
 
 
