@@ -3,27 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Integration Question Generator</title>
+    <title>Math Question Generator</title>
     <link rel="stylesheet" href="style.css">
+    <!-- MathJax for rendering pretty math formulas -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
     <main class="card">
-        <h1>Integration Question Generator</h1>
-        <p class="subtitle">Generate integration questions by difficulty</p>
+        <h1>Math Question Generator</h1>
+        <p class="subtitle">Practice math problems by topic and difficulty</p>
 
-        <div class="control-group">
-            <label for="difficulty-select">Select Difficulty:</label>
-            <select id="difficulty-select">
-                <option value="easy">Easy</option>
-                <option value="medium" selected>Medium</option>
-                <option value="hard">Hard</option>
-            </select>
+        <div class="controls-grid">
+            <div class="control-group">
+                <label for="topic-select">Topic:</label>
+                <select id="topic-select">
+                    <option value="integration" selected>Integration</option>
+                    <!-- Add more topics here as your API expands -->
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="difficulty-select">Difficulty:</label>
+                <select id="difficulty-select">
+                    <option value="easy">Easy</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+            </div>
         </div>
 
-        <button id="fetch-btn" type="button">Generate Question</button>
+        <button id="fetch-btn" type="button">Generate New Question</button>
 
         <div id="question-container" class="question-box">
-            <p id="question-text">Select difficulty and click generate.</p>
+            <p id="question-text">Select options and click generate.</p>
+        </div>
+
+        <!-- User Answer Section -->
+        <div id="answer-section" class="answer-section" hidden>
+            <div class="input-group">
+                <input type="text" id="user-answer-input" placeholder="Enter your answer (e.g. x^3*sin(x) + C)" />
+                <button id="submit-btn" type="button">Submit Answer</button>
+            </div>
+
+            <div id="feedback-box" class="feedback-box" hidden></div>
+
+            <button id="show-steps-btn" class="secondary-btn" type="button">Show Step-by-Step Solution</button>
+
+            <div id="steps-container" class="steps-box" hidden>
+                <h3>Solution Steps:</h3>
+                <ol id="steps-list"></ol>
+            </div>
         </div>
 
         <p id="error-msg" class="error-text" hidden></p>
