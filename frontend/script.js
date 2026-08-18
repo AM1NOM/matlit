@@ -16,35 +16,100 @@ const stepsList = document.getElementById('steps-list');
 
 let currentData = null;
 
-// Convert Python raw math string into valid LaTeX
-function convertToLaTeX(text) {
-    if (!text) return '';
+// Helper: Determine if a specific word/token is a math expression
+function isMathToken(token) {
+    if (!token.trim()) return false;
+    
+    // If it contains math operators or parentheses
+    if (/[*+\-=\/∫^()]/.test(token)) return true;
+    // If it contains numbers
+    if (/[0-9]/.test(token)) return true;
+    
+    // If it's a specific math variable or function (ignoring attached punctuation)
+    let clean = token.replace(/^[.,:]+|[.,:]+$/g, '');
+    if (['x', 'y', 'z', 'C', 'dx', 'dy', 'sin', 'cos', 'tan', 'exp', 'log', 'ln'].includes(clean)) return true;
+    
+    return false;
+}
 
+// Helper: Formats only the math parts into clean LaTeX
+function formatMath(text) {
     let formatted = text;
-
-    // Convert exponent notation x**3 -> x^{3} or (expr)**3 -> (expr)^{3}
-    formatted = formatted.replace(/([a-zA-Z0-9_()]+)\*\*([a-zA-Z0-9_-]+)/g, '$1^{$2}');
-
-    // Convert explicit multiplication * to LaTeX spacing or implicit multiplication
-    formatted = formatted.replace(/\*/g, ' ');
-
-    // Convert trig functions to LaTeX commands
+    
+    // Convert exp(something) to e^{something}
+    formatted = formatted.replace(/\bexp\(([^)]+)\)/g, 'e^{$1}');
+    
+    // Convert Python exponents (**) to LaTeX exponents (^)
+    formatted = formatted.replace(/\*\*(\([^)]+\))/g, '^{$1}'); // e.g. **(x+1) -> ^{(x+1)}
+    formatted = formatted.replace(/\*\*([a-zA-Z0-9]+)/g, '^{$1}'); // e.g. **3 -> ^{3}
+    formatted = formatted.replace(/\*\*/g, '^'); // fallback
+    
+    // Convert multiplication to a dot with spacing
+    formatted = formatted.replace(/\*/g, ' \\cdot ');
+    
+    // Convert trig functions to standard LaTeX upright font
     formatted = formatted.replace(/\b(sin|cos|tan|csc|sec|cot|log|ln)\b/g, '\\$1');
-
-    // Convert integral signs and differentials
+    
+    // Convert integral signs and add spacing for dx
     formatted = formatted.replace(/∫/g, '\\int ');
     formatted = formatted.replace(/\bdx\b/g, '\\,dx');
-
+    
     return formatted;
 }
 
-// Trigger MathJax re-render for dynamically added HTML
+// Core Engine: Separates English text from Math formulas so both look correct
+function processMixedText(text, useDisplayMath = false) {
+    let tokens = text.split(/(\s+)/); // Split by spaces, keeping the spaces
+    let result = '';
+    let mathMode = false;
+    let mathBuffer = '';
+    
+    const openTag = useDisplayMath ? '\\[' : '\\(';
+    const closeTag = useDisplayMath ? '\\]' : '\\)';
+    
+    for (let i = 0; i < tokens.length; i++) {
+        let token = tokens[i];
+        if (!token.trim()) {
+            if (mathMode) mathBuffer += token;
+            else result += token;
+            continue;
+        }
+        
+        if (isMathToken(token)) {
+            if (!mathMode) {
+                mathMode = true;
+                mathBuffer = token;
+            } else {
+                mathBuffer += token;
+            }
+        } else {
+            if (mathMode) {
+                let trailingSpace = mathBuffer.match(/\s+$/);
+                if (trailingSpace) mathBuffer = mathBuffer.replace(/\s+$/, '');
+                
+                result += `${openTag} ${formatMath(mathBuffer)} ${closeTag}`;
+                if (trailingSpace) result += trailingSpace[0];
+                
+                mathMode = false;
+                mathBuffer = '';
+            }
+            result += token;
+        }
+    }
+    
+    if (mathMode) {
+        result += `${openTag} ${formatMath(mathBuffer)} ${closeTag}`;
+    }
+    
+    return result;
+}
+
 async function renderMathInElement(element) {
     if (window.MathJax && window.MathJax.typesetPromise) {
         try {
             await MathJax.typesetPromise([element]);
         } catch (err) {
-            console.error('MathJax rendering error:', err);
+            console.error('MathJax error:', err);
         }
     }
 }
@@ -52,10 +117,8 @@ async function renderMathInElement(element) {
 async function generateQuestion() {
     const topic = topicSelect.value;
     const difficulty = difficultySelect.value;
-
     const url = `${BASE_URL}?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}`;
 
-    // Reset UI state
     errorMsg.hidden = true;
     answerSection.hidden = true;
     stepsContainer.hidden = true;
@@ -68,17 +131,14 @@ async function generateQuestion() {
     try {
         const response = await fetch(url, { method: 'POST' });
 
-        if (!response.ok) {
-            throw new Error(`Server status: ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`Server status: ${response.status}`);
+        
         currentData = await response.json();
 
-        // Convert question to LaTeX display equation
-        const latexQuestion = convertToLaTeX(currentData.question);
-        questionText.innerHTML = `\\[ ${latexQuestion} \\]`;
-
+        // Process the question (true = use centered display math)
+        questionText.innerHTML = processMixedText(currentData.question, true);
         await renderMathInElement(questionText);
+        
         answerSection.hidden = false;
 
     } catch (error) {
@@ -114,26 +174,18 @@ function checkAnswer() {
 async function toggleSteps() {
     if (!currentData || !currentData.steps) return;
 
-    const isHidden = stepsContainer.hidden;
-
-    if (isHidden) {
+    if (stepsContainer.hidden) {
         stepsList.innerHTML = '';
 
-        // Build list items with individual LaTeX expressions
         currentData.steps.forEach(stepText => {
             const li = document.createElement('li');
-            const latexStep = convertToLaTeX(stepText);
-            
-            // Wrap step in inline MathJax brackets
-            li.innerHTML = `\\(${latexStep}\\)`;
+            // Process the step (false = use inline math so it flows with the text)
+            li.innerHTML = processMixedText(stepText, false);
             stepsList.appendChild(li);
         });
 
-        // Unhide container BEFORE triggering MathJax typeset
         stepsContainer.hidden = false;
         showStepsBtn.innerText = 'Hide Step-by-Step Solution';
-
-        // Re-render math inside the steps list
         await renderMathInElement(stepsList);
     } else {
         stepsContainer.hidden = true;
