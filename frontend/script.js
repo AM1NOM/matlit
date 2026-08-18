@@ -16,20 +16,36 @@ const stepsList = document.getElementById('steps-list');
 
 let currentData = null;
 
-// Convert Python math notation to LaTeX for rendering
-function formatMathToLaTeX(text) {
+// Convert Python raw math string into valid LaTeX
+function convertToLaTeX(text) {
     if (!text) return '';
-    return text
-        .replace(/∫/g, '\\int ')
-        .replace(/\*\*/g, '^')
-        .replace(/\*/g, ' ')
-        .replace(/dx/g, ' \\, dx');
+
+    let formatted = text;
+
+    // Convert exponent notation x**3 -> x^{3} or (expr)**3 -> (expr)^{3}
+    formatted = formatted.replace(/([a-zA-Z0-9_()]+)\*\*([a-zA-Z0-9_-]+)/g, '$1^{$2}');
+
+    // Convert explicit multiplication * to LaTeX spacing or implicit multiplication
+    formatted = formatted.replace(/\*/g, ' ');
+
+    // Convert trig functions to LaTeX commands
+    formatted = formatted.replace(/\b(sin|cos|tan|csc|sec|cot|log|ln)\b/g, '\\$1');
+
+    // Convert integral signs and differentials
+    formatted = formatted.replace(/∫/g, '\\int ');
+    formatted = formatted.replace(/\bdx\b/g, '\\,dx');
+
+    return formatted;
 }
 
-// Render math elements on screen using MathJax
-function renderMath() {
-    if (window.MathJax) {
-        MathJax.typesetPromise();
+// Trigger MathJax re-render for dynamically added HTML
+async function renderMathInElement(element) {
+    if (window.MathJax && window.MathJax.typesetPromise) {
+        try {
+            await MathJax.typesetPromise([element]);
+        } catch (err) {
+            console.error('MathJax rendering error:', err);
+        }
     }
 }
 
@@ -39,12 +55,13 @@ async function generateQuestion() {
 
     const url = `${BASE_URL}?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}`;
 
-    // Reset state
+    // Reset UI state
     errorMsg.hidden = true;
     answerSection.hidden = true;
     stepsContainer.hidden = true;
     feedbackBox.hidden = true;
     userAnswerInput.value = '';
+    showStepsBtn.innerText = 'Show Step-by-Step Solution';
     fetchBtn.disabled = true;
     questionText.innerText = 'Generating question...';
 
@@ -57,11 +74,11 @@ async function generateQuestion() {
 
         currentData = await response.json();
 
-        // Render formatted question LaTeX
-        const formattedQuestion = formatMathToLaTeX(currentData.question);
-        questionText.innerHTML = `\\[ ${formattedQuestion} \\]`;
-        
-        renderMath();
+        // Convert question to LaTeX display equation
+        const latexQuestion = convertToLaTeX(currentData.question);
+        questionText.innerHTML = `\\[ ${latexQuestion} \\]`;
+
+        await renderMathInElement(questionText);
         answerSection.hidden = false;
 
     } catch (error) {
@@ -73,7 +90,6 @@ async function generateQuestion() {
     }
 }
 
-// Clean string for checking basic equality
 function normalizeString(str) {
     return str.replace(/\s+/g, '').replace(/\*\*/g, '^').toLowerCase();
 }
@@ -95,23 +111,30 @@ function checkAnswer() {
     }
 }
 
-function toggleSteps() {
+async function toggleSteps() {
     if (!currentData || !currentData.steps) return;
 
     const isHidden = stepsContainer.hidden;
 
     if (isHidden) {
         stepsList.innerHTML = '';
-        currentData.steps.forEach(step => {
+
+        // Build list items with individual LaTeX expressions
+        currentData.steps.forEach(stepText => {
             const li = document.createElement('li');
-            const formattedStep = formatMathToLaTeX(step);
-            li.innerHTML = `\\(${formattedStep}\\)`;
+            const latexStep = convertToLaTeX(stepText);
+            
+            // Wrap step in inline MathJax brackets
+            li.innerHTML = `\\(${latexStep}\\)`;
             stepsList.appendChild(li);
         });
 
-        renderMath();
+        // Unhide container BEFORE triggering MathJax typeset
         stepsContainer.hidden = false;
         showStepsBtn.innerText = 'Hide Step-by-Step Solution';
+
+        // Re-render math inside the steps list
+        await renderMathInElement(stepsList);
     } else {
         stepsContainer.hidden = true;
         showStepsBtn.innerText = 'Show Step-by-Step Solution';

@@ -5,8 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Math Question Generator</title>
     <link rel="stylesheet" href="style.css">
-    <!-- MathJax for rendering pretty math formulas -->
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <!-- MathJax Configuration & Script -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </head>
 <body>
     <main class="card">
@@ -18,7 +30,6 @@
                 <label for="topic-select">Topic:</label>
                 <select id="topic-select">
                     <option value="integration" selected>Integration</option>
-                    <!-- Add more topics here as your API expands -->
                 </select>
             </div>
 
@@ -35,10 +46,10 @@
         <button id="fetch-btn" type="button">Generate New Question</button>
 
         <div id="question-container" class="question-box">
-            <p id="question-text">Select options and click generate.</p>
+            <div id="question-text">Select options and click generate.</div>
         </div>
 
-        <!-- User Answer Section -->
+        <!-- User Answer & Steps Section -->
         <div id="answer-section" class="answer-section" hidden>
             <div class="input-group">
                 <input type="text" id="user-answer-input" placeholder="Enter your answer (e.g. x^3*sin(x) + C)" />
