@@ -78,6 +78,7 @@ logoutBtn.addEventListener('click', async () => {
 
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
+  window.currentUser = user;
   if (user) {
     // show user info in the UI
     try {
@@ -88,7 +89,50 @@ onAuthStateChanged(auth, async (user) => {
       userName.textContent = user.displayName || user.email || '';
     } catch (e) { /* ignore UI update errors */ }
 
-    await fetchUserWrongSet(user.uid);
+    async function fetchUserWrongSet(uid) {
+  userWrongSet.clear();
+  userWrongMap.clear();
+
+  if (!uid) {
+    console.warn('fetchUserWrongSet called without uid');
+    return;
+  }
+
+  console.log('fetchUserWrongSet: fetching wrong_questions for uid=', uid);
+
+  try {
+    const collRef = collection(db, 'users', uid, 'wrong_questions');
+    const snapshot = await getDocs(collRef);
+
+    console.log('fetchUserWrongSet: snapshot size =', snapshot.size);
+
+    if (snapshot.empty) {
+      console.log('fetchUserWrongSet: no wrong_questions documents found for this user.');
+    }
+
+    snapshot.forEach(docSnap => {
+      const qid = docSnap.id;
+      const data = docSnap.data();
+      console.log('fetchUserWrongSet: loaded doc', qid, data);
+      userWrongSet.add(qid);
+      userWrongMap.set(qid, {
+        count: data.count ?? 0,
+        lastWrong: data.lastWrong ?? null,
+        lastCorrect: data.lastCorrect ?? null,
+        questionSnapshot: data.questionSnapshot ?? null
+      });
+    });
+  } catch (err) {
+    console.error('fetchUserWrongSet: failed', err);
+    // Helpful message for permission problems
+    if (err && err.code && err.code.includes('permission-denied')) {
+      alert('Permission denied reading your wrong-questions. Check Firestore rules for users/{uid}/wrong_questions.');
+    } else {
+      alert('Failed to fetch your question history (see console).');
+    }
+  }
+}
+
     // if you already have a quiz loaded, re-render to show highlights:
     if (currentSet && currentSet.length) renderQuiz(currentSet);
   } else {
@@ -141,7 +185,7 @@ async function fetchUserWrongSet(uid) {
 // Save a wrong answer (increment counter). Creates the doc if missing.
 async function saveWrongQuestion(uid, question) {
   if (!uid || !question?.id) return;
-  const qid = question.id;
+  const qid = String(question.id);
   const docRef = doc(db, 'users', uid, 'wrong_questions', qid);
   try {
     // Try update (increment). If it fails because doc doesn't exist, fallback to set.
@@ -171,7 +215,7 @@ async function saveWrongQuestion(uid, question) {
 // Optionally mark question as corrected (set lastCorrect). If you want to remove from wrong set, delete doc.
 async function markQuestionCorrect(uid, question) {
   if (!uid || !question?.id) return;
-  const qid = question.id;
+  const qid = String(question.id);
   const docRef = doc(db, 'users', uid, 'wrong_questions', qid);
   try {
     // write lastCorrect; keep count
@@ -252,8 +296,9 @@ function renderQuiz(questions) {
 
     const fieldset = document.createElement('fieldset');
     const legend = document.createElement('legend');
-    legend.textContent = `${idx + 1}. ${q.question}`;
+    legend.innerHTML = `${idx + 1}. ${q.question.replace(/\n/g, '<br>')}`;
     fieldset.appendChild(legend);
+
 
     const options = document.createElement('div');
     options.className = 'options';
