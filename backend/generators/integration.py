@@ -49,7 +49,7 @@ def make_integral_question(antiderivative_expr):
 
     return {"question": f"Find ∫ {f} dx", "answer": f"{antiderivative_expr} + C", "steps": steps}
 
-def generate():
-    F = DIFFICULTY_GENERATORS['hard']()
+def generate(difficulty):
+    F = DIFFICULTY_GENERATORS[difficulty]()
     return make_integral_question(F)
 

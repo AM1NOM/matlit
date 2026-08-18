@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from generators import quadratics, integration, logic
+from generators import integration
 
 app = FastAPI()
 
