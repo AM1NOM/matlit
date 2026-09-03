@@ -19,7 +19,6 @@ const firebaseConfig = {
   measurementId: "G-7LW7KRP4ZY"
 };
 
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
@@ -41,22 +40,62 @@ export async function logoutUser() {
     return await signOut(auth);
 }
 
-export function observeAuthState(callback) {
-    onAuthStateChanged(auth, callback);
-}
-
-// Login/Register UI Event Handlers
+// Global Auth Observer
 document.addEventListener('DOMContentLoaded', () => {
+    // Header UI Elements (index.html)
+    const headerLoginBtn = document.getElementById('auth-login-btn');
+    const headerUserInfo = document.getElementById('auth-user-info');
+    const headerUserPic = document.getElementById('header-user-pic');
+    const headerUserName = document.getElementById('header-user-name');
+
+    // Profile Page Elements (profile.html)
+    const loginSection = document.getElementById('login-section');
+    const profileSection = document.getElementById('profile-section');
+
+    onAuthStateChanged(auth, (user) => {
+        // --- 1. Update Index.html Header ---
+        if (headerLoginBtn && headerUserInfo) {
+            if (user) {
+                headerLoginBtn.hidden = true;
+                headerUserInfo.style.display = 'flex';
+
+                // Extract first name from full name or default to email handle
+                const firstName = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
+                headerUserName.innerText = firstName;
+                headerUserPic.src = user.photoURL || "https://via.placeholder.com/36?text=U";
+            } else {
+                headerLoginBtn.hidden = false;
+                headerUserInfo.style.display = 'none';
+            }
+        }
+
+        // --- 2. Update Profile.html View ---
+        if (loginSection && profileSection) {
+            if (user) {
+                loginSection.hidden = true;
+                profileSection.hidden = false;
+
+                document.getElementById('user-name').innerText = user.displayName || "Math Enthusiast";
+                document.getElementById('user-email').innerText = user.email;
+                document.getElementById('user-pic').src = user.photoURL || "https://via.placeholder.com/100?text=User";
+            } else {
+                loginSection.hidden = false;
+                profileSection.hidden = true;
+            }
+        }
+    });
+
+    // Profile Page Event Listeners
     const loginForm = document.getElementById('login-form');
     const googleBtn = document.getElementById('google-login-btn');
     const registerBtn = document.getElementById('register-btn');
+    const logoutBtn = document.getElementById('logout-btn');
 
     if (loginForm) {
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const errorMsg = document.getElementById('login-error');
 
-        // Email/Password Login
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             errorMsg.hidden = true;
@@ -69,7 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Email/Password Register
         if (registerBtn) {
             registerBtn.addEventListener('click', async () => {
                 errorMsg.hidden = true;
@@ -88,7 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Google Sign-In
         if (googleBtn) {
             googleBtn.addEventListener('click', async () => {
                 errorMsg.hidden = true;
@@ -101,5 +138,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
+    }
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await logoutUser();
+            } catch (error) {
+                alert("Error signing out: " + error.message);
+            }
+        });
     }
 });

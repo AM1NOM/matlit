@@ -6,62 +6,78 @@
     <title>Math Question Generator</title>
     <link rel="stylesheet" href="style.css">
     
+    <script type="module" src="../database/auth.js" defer></script>
     <script src="script.js" defer></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </head>
 <body>
-    <main class="card">
-        <!-- Top bar with Title & Login Button -->
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
-            <div>
-                <h1 style="margin: 0;">Math Question Generator</h1>
-                <p class="subtitle" style="margin: 5px 0 0 0;">Practice math problems by topic and difficulty</p>
-            </div>
-            <a href="login.html" style="text-decoration: none;">
-                <button type="button" style="padding: 8px 16px; cursor: pointer;">Login</button>
+    <!-- Container aligning header top-left directly above main card -->
+    <div class="page-container" style="max-width: 600px; margin: 20px auto; padding: 0 15px;">
+        
+        <!-- Header positioned above card -->
+        <header style="display: flex; justify-content: flex-start; margin-bottom: 12px;">
+            <a href="profile.html" id="auth-badge-link" style="text-decoration: none; color: inherit;">
+                <!-- Logged Out Button -->
+                <button id="auth-login-btn" type="button" style="padding: 8px 16px; cursor: pointer;">Login</button>
+                
+                <!-- Logged In User Badge -->
+                <div id="auth-user-info" style="display: flex; align-items: center; gap: 10px; cursor: pointer;" hidden>
+                    <!-- Google Profile Picture -->
+                    <img id="header-user-pic" src="" alt="Profile" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc; display: none;" />
+                    
+                    <!-- Fallback First Letter Circle -->
+                    <div id="header-user-initial" style="width: 36px; height: 36px; border-radius: 50%; background: #007bff; color: white; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;"></div>
+                    
+                    <span id="header-user-name" style="font-weight: 600; font-size: 1rem;"></span>
+                </div>
             </a>
-        </div>
+        </header>
 
-        <div class="controls-grid">
-            <div class="control-group">
-                <label for="topic-select">Topic:</label>
-                <select id="topic-select">
-                    <option value="integration" selected>Integration</option>
-                </select>
+        <main class="card">
+            <h1 style="margin-top: 0;">Math Question Generator</h1>
+            <p class="subtitle">Practice math problems by topic and difficulty</p>
+
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label for="topic-select">Topic:</label>
+                    <select id="topic-select">
+                        <option value="integration" selected>Integration</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="difficulty-select">Difficulty:</label>
+                    <select id="difficulty-select">
+                        <option value="easy">Easy</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="control-group">
-                <label for="difficulty-select">Difficulty:</label>
-                <select id="difficulty-select">
-                    <option value="easy">Easy</option>
-                    <option value="medium" selected>Medium</option>
-                    <option value="hard">Hard</option>
-                </select>
-            </div>
-        </div>
+            <button id="fetch-btn" type="button">Generate New Question</button>
 
-        <button id="fetch-btn" type="button">Generate New Question</button>
-
-        <div class="question-box">
-            <div id="question-text">Select options and click generate.</div>
-        </div>
-
-        <!-- Answer & Steps Section -->
-        <div id="answer-section" class="answer-section" hidden>
-            <div class="input-group">
-                <input type="text" id="user-answer-input" placeholder="Enter your answer (e.g. x^3*sin(x) + C)" />
-                <button id="submit-btn" type="button">Submit Answer</button>
+            <div class="question-box">
+                <div id="question-text">Select options and click generate.</div>
             </div>
 
-            <div id="feedback-box" class="feedback-box" hidden></div>
+            <!-- Answer & Steps Section -->
+            <div id="answer-section" class="answer-section" hidden>
+                <div class="input-group">
+                    <input type="text" id="user-answer-input" placeholder="Enter your answer (e.g. x^3*sin(x) + C)" />
+                    <button id="submit-btn" type="button">Submit Answer</button>
+                </div>
 
-            <button id="show-steps-btn" class="secondary-btn" type="button">Show Step-by-Step Solution</button>
+                <div id="feedback-box" class="feedback-box" hidden></div>
 
-            <div id="steps-container" class="steps-box" hidden>
-                <h3>Solution Steps:</h3>
-                <ol id="steps-list"></ol>
+                <button id="show-steps-btn" class="secondary-btn" type="button">Show Step-by-Step Solution</button>
+
+                <div id="steps-container" class="steps-box" hidden>
+                    <h3>Solution Steps:</h3>
+                    <ol id="steps-list"></ol>
+                </div>
             </div>
-        </div>
-    </main>
+        </main>
+    </div>
 </body>
 </html>
