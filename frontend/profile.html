@@ -9,47 +9,59 @@
     <script type="module" src="../database/auth.js" defer></script>
 </head>
 <body>
-    <main class="card">
+    <div class="page-container" style="max-width: 600px; margin: 20px auto; padding: 0 15px;">
 
-        <!-- SECTION 1: Shown when LOGGED IN -->
-        <div id="profile-section" style="text-align: center;" hidden>
-            <h1>Your Profile</h1>
-            <p class="subtitle">Welcome back!</p>
+        <!-- Header: nav button back to the generator -->
+        <header style="display: flex; justify-content: flex-start; margin-bottom: 12px;">
+            <a href="index.html" style="text-decoration: none; color: inherit;">
+                <button type="button"
+                        style="display: flex; align-items: center; gap: 8px; padding: 6px 16px; cursor: pointer; border: 1px solid #ccc; border-radius: 20px; background: #fff;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <span style="font-weight: 600; font-size: 0.95rem;">Generator</span>
+                </button>
+            </a>
+        </header>
 
-            <div style="margin: 20px 0; display: flex; flex-direction: column; align-items: center;">
-                <!-- Profile Image -->
-                <img id="user-pic" src="" alt="Profile Picture"
-                     style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc; margin-bottom: 10px; display: none;" />
+        <main class="card">
 
-                <!-- Fallback Initial Circle -->
-                <div id="user-initial"
-                     style="width: 90px; height: 90px; border-radius: 50%; background: #007bff; color: white; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 2.5rem; margin-bottom: 10px;"></div>
+            <!-- SECTION 1: Shown when LOGGED IN -->
+            <div id="profile-section" style="text-align: center;" hidden>
+                <h1>Your Profile</h1>
+                <p class="subtitle">Welcome back!</p>
 
-                <h2 id="user-name" style="margin: 5px 0;">Loading...</h2>
+                <div style="margin: 20px 0; display: flex; flex-direction: column; align-items: center;">
+                    <!-- Profile Image -->
+                    <img id="user-pic" src="" alt="Profile Picture"
+                         style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc; margin-bottom: 10px; display: none;" />
+
+                    <!-- Fallback Initial Circle -->
+                    <div id="user-initial"
+                         style="width: 90px; height: 90px; border-radius: 50%; background: #007bff; color: white; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 2.5rem; margin-bottom: 10px;"></div>
+
+                    <h2 id="user-name" style="margin: 5px 0;">Loading...</h2>
+                </div>
+
+                <button id="logout-btn" type="button"
+                        style="width: 100%; padding: 12px; cursor: pointer; background: #dc3545; color: white; border: none; border-radius: 4px; font-weight: bold; margin-top: 20px;">
+                    Log Out
+                </button>
             </div>
 
-            <button id="logout-btn" type="button"
-                    style="width: 100%; padding: 12px; cursor: pointer; background: #dc3545; color: white; border: none; border-radius: 4px; font-weight: bold; margin-top: 20px;">
-                Log Out
-            </button>
-        </div>
+            <!-- SECTION 2: Shown when LOGGED OUT -->
+            <div id="login-section">
+                <h1>Welcome Back</h1>
+                <p class="subtitle">Log in with Google to track your progress</p>
 
-        <!-- SECTION 2: Shown when LOGGED OUT -->
-        <div id="login-section">
-            <h1>Welcome Back</h1>
-            <p class="subtitle">Log in with Google to track your progress</p>
+                <button id="google-login-btn" type="button"
+                        style="width: 100%; padding: 12px; margin-top: 20px; cursor: pointer; background: #fff; border: 1px solid #ccc; border-radius: 4px; font-weight: bold;">
+                    Sign in with Google
+                </button>
 
-            <button id="google-login-btn" type="button"
-                    style="width: 100%; padding: 12px; margin-top: 20px; cursor: pointer; background: #fff; border: 1px solid #ccc; border-radius: 4px; font-weight: bold;">
-                Sign in with Google
-            </button>
-
-            <p id="login-error" class="error-text" style="color: red; margin-top: 10px; text-align: center;" hidden></p>
-        </div>
-
-        <p style="text-align: center; margin-top: 25px;">
-            <a href="index.html" style="color: inherit; text-decoration: underline;">&larr; Back to Generator</a>
-        </p>
-    </main>
+                <p id="login-error" class="error-text" style="color: red; margin-top: 10px; text-align: center;" hidden></p>
+            </div>
+        </main>
+    </div>
 </body>
 </html>

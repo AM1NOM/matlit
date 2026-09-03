@@ -32,38 +32,72 @@ export async function logoutUser() {
     return await signOut(auth);
 }
 
-// ---- UI updater: shows profile pic/initial + name, or the login button ----
+// ---- UI updater ----
+// Handles two independent UI spots, each optional depending on the page:
+//   1. Header badge on index.html   (auth-btn / header-user-pic / header-user-initial / header-default-icon / header-auth-label)
+//   2. Full profile view on profile.html (login-section / profile-section)
 
 function renderUser(user) {
+    const firstName = user ? (user.displayName ? user.displayName.split(' ')[0] : "User") : null;
+    const initial = firstName ? firstName.charAt(0).toUpperCase() : "";
+
+    // ---- 1. Header badge (index.html) ----
+    const headerPic = document.getElementById('header-user-pic');
+    const headerInitial = document.getElementById('header-user-initial');
+    const headerDefaultIcon = document.getElementById('header-default-icon');
+    const headerLabel = document.getElementById('header-auth-label');
+
+    if (headerLabel) {
+        if (user) {
+            headerLabel.innerText = firstName;
+            headerDefaultIcon.style.display = 'none';
+
+            if (user.photoURL) {
+                headerPic.src = user.photoURL;
+                headerPic.style.display = 'block';
+                headerInitial.style.display = 'none';
+            } else {
+                headerPic.style.display = 'none';
+                headerInitial.innerText = initial;
+                headerInitial.style.display = 'flex';
+            }
+        } else {
+            headerLabel.innerText = 'Login';
+            headerDefaultIcon.style.display = 'block';
+            headerPic.style.display = 'none';
+            headerInitial.style.display = 'none';
+        }
+    }
+
+    // ---- 2. Full profile view (profile.html) ----
     const loginSection = document.getElementById('login-section');
     const profileSection = document.getElementById('profile-section');
 
-    // If this page doesn't have these elements, nothing to do.
-    if (!loginSection || !profileSection) return;
+    if (loginSection && profileSection) {
+        if (user) {
+            loginSection.hidden = true;
+            profileSection.hidden = false;
 
-    if (user) {
-        loginSection.hidden = true;
-        profileSection.hidden = false;
+            const nameEl = document.getElementById('user-name');
+            const picEl = document.getElementById('user-pic');
+            const initialEl = document.getElementById('user-initial');
 
-        const nameEl = document.getElementById('user-name');
-        const picEl = document.getElementById('user-pic');
-        const initialEl = document.getElementById('user-initial');
+            const fullName = user.displayName || "User";
+            if (nameEl) nameEl.innerText = fullName;
 
-        const fullName = user.displayName || "User";
-        if (nameEl) nameEl.innerText = fullName;
-
-        if (user.photoURL) {
-            picEl.src = user.photoURL;
-            picEl.style.display = 'block';
-            initialEl.style.display = 'none';
+            if (user.photoURL) {
+                picEl.src = user.photoURL;
+                picEl.style.display = 'block';
+                initialEl.style.display = 'none';
+            } else {
+                picEl.style.display = 'none';
+                initialEl.innerText = fullName.charAt(0).toUpperCase();
+                initialEl.style.display = 'flex';
+            }
         } else {
-            picEl.style.display = 'none';
-            initialEl.innerText = fullName.charAt(0).toUpperCase();
-            initialEl.style.display = 'flex';
+            loginSection.hidden = false;
+            profileSection.hidden = true;
         }
-    } else {
-        loginSection.hidden = false;
-        profileSection.hidden = true;
     }
 }
 
