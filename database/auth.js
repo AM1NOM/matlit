@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const headerLoginBtn = document.getElementById('auth-login-btn');
     const headerUserInfo = document.getElementById('auth-user-info');
     const headerUserPic = document.getElementById('header-user-pic');
+    const headerUserInitial = document.getElementById('header-user-initial');
     const headerUserName = document.getElementById('header-user-name');
 
     // Profile Page Elements (profile.html)
@@ -53,39 +54,65 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileSection = document.getElementById('profile-section');
 
     onAuthStateChanged(auth, (user) => {
-        // --- 1. Update Index.html Header ---
-        if (headerLoginBtn && headerUserInfo) {
-            if (user) {
+        if (user) {
+            // Determine display names & initial
+            const displayName = user.displayName || "";
+            const emailName = user.email ? user.email.split('@')[0] : "User";
+            const firstName = displayName ? displayName.split(' ')[0] : emailName;
+            const initial = firstName.charAt(0).toUpperCase();
+
+            // --- 1. Update index.html Header ---
+            if (headerLoginBtn && headerUserInfo) {
                 headerLoginBtn.hidden = true;
                 headerUserInfo.style.display = 'flex';
-
-                // Extract first name from full name or default to email handle
-                const firstName = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
                 headerUserName.innerText = firstName;
-                headerUserPic.src = user.photoURL || "https://via.placeholder.com/36?text=U";
-            } else {
-                headerLoginBtn.hidden = false;
-                headerUserInfo.style.display = 'none';
-            }
-        }
 
-        // --- 2. Update Profile.html View ---
-        if (loginSection && profileSection) {
-            if (user) {
+                if (user.photoURL) {
+                    headerUserPic.src = user.photoURL;
+                    headerUserPic.style.display = 'block';
+                    headerUserInitial.style.display = 'none';
+                } else {
+                    headerUserPic.style.display = 'none';
+                    headerUserInitial.innerText = initial;
+                    headerUserInitial.style.display = 'flex';
+                }
+            }
+
+            // --- 2. Update profile.html View ---
+            if (loginSection && profileSection) {
                 loginSection.hidden = true;
                 profileSection.hidden = false;
 
-                document.getElementById('user-name').innerText = user.displayName || "Math Enthusiast";
+                document.getElementById('user-name').innerText = user.displayName || firstName;
                 document.getElementById('user-email').innerText = user.email;
-                document.getElementById('user-pic').src = user.photoURL || "https://via.placeholder.com/100?text=User";
-            } else {
+
+                const userPic = document.getElementById('user-pic');
+                const userInitial = document.getElementById('user-initial');
+
+                if (user.photoURL) {
+                    userPic.src = user.photoURL;
+                    userPic.style.display = 'block';
+                    userInitial.style.display = 'none';
+                } else {
+                    userPic.style.display = 'none';
+                    userInitial.innerText = initial;
+                    userInitial.style.display = 'flex';
+                }
+            }
+        } else {
+            // Logged Out States
+            if (headerLoginBtn && headerUserInfo) {
+                headerLoginBtn.hidden = false;
+                headerUserInfo.style.display = 'none';
+            }
+            if (loginSection && profileSection) {
                 loginSection.hidden = false;
                 profileSection.hidden = true;
             }
         }
     });
 
-    // Profile Page Event Listeners
+    // Event Listeners for Forms and Buttons
     const loginForm = document.getElementById('login-form');
     const googleBtn = document.getElementById('google-login-btn');
     const registerBtn = document.getElementById('register-btn');

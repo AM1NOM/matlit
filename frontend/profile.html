@@ -16,8 +16,13 @@
             <h1>Your Profile</h1>
             <p class="subtitle">Welcome back!</p>
 
-            <div style="margin: 20px 0;">
-                <img id="user-pic" src="" alt="Profile Picture" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc; margin-bottom: 10px;" />
+            <div style="margin: 20px 0; display: flex; flex-direction: column; align-items: center;">
+                <!-- Profile Image -->
+                <img id="user-pic" src="" alt="Profile Picture" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc; margin-bottom: 10px; display: none;" />
+                
+                <!-- Fallback Initial Circle -->
+                <div id="user-initial" style="width: 90px; height: 90px; border-radius: 50%; background: #007bff; color: white; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 36px; margin-bottom: 10px;"></div>
+
                 <h2 id="user-name" style="margin: 5px 0;">Loading...</h2>
                 <p id="user-email" style="color: #666; margin: 0;"></p>
             </div>
