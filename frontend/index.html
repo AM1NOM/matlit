@@ -3,90 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' https://www.gstatic.com/firebasejs/ https://apis.google.com https://cdn.jsdelivr.net 'unsafe-inline'; frame-src https://*.firebaseapp.com https://accounts.google.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com https://accounts.google.com https://www.gstatic.com https://matlit.onrender.com;">
-
     <title>Math Question Generator</title>
     <link rel="stylesheet" href="style.css">
-
-    <script type="module" src="../database/auth.js" defer></script>
+    
     <script src="script.js" defer></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </head>
 <body>
-    <!-- Container aligning header top-left directly above main card -->
-    <div class="page-container" style="max-width: 600px; margin: 20px auto; padding: 50px 15px 0;">
-
-        <!-- Header pinned to the very top-left of the viewport -->
-        <header style="position: fixed; top: 0; left: 0; margin: 0; padding: 8px; z-index: 10;">
-            <a href="profile.html" id="auth-badge-link" style="text-decoration: none; color: inherit;">
-                <button id="auth-btn" type="button"
-                        style="display: flex; align-items: center; gap: 8px; padding: 6px 16px 6px 6px; cursor: pointer; border: 1px solid #ccc; border-radius: 20px; background: #fff;">
-
-                    <!-- Default profile picture icon (shown when logged out) -->
-                    <svg id="header-default-icon" width="28" height="28" viewBox="0 0 24 24"
-                         style="border-radius: 50%; background: #e9ecef; padding: 3px; box-sizing: border-box; flex-shrink: 0;">
-                        <circle cx="12" cy="8" r="4" fill="#adb5bd"/>
-                        <path d="M4 20c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5" fill="#adb5bd"/>
-                    </svg>
-
-                    <!-- Google profile picture (shown when logged in, has photoURL) -->
-                    <img id="header-user-pic" src="" alt="Profile"
-                         style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; display: none; flex-shrink: 0;" />
-
-                    <!-- Fallback initial circle (shown when logged in, no photoURL) -->
-                    <div id="header-user-initial"
-                         style="width: 28px; height: 28px; border-radius: 50%; background: #007bff; color: white; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; flex-shrink: 0;"></div>
-
-                    <span id="header-auth-label" style="font-weight: 600; font-size: 0.95rem;">Login</span>
-                </button>
+    <main class="card">
+        <!-- Top bar with Title & Login Button -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+            <div>
+                <h1 style="margin: 0;">Math Question Generator</h1>
+                <p class="subtitle" style="margin: 5px 0 0 0;">Practice math problems by topic and difficulty</p>
+            </div>
+            <a href="login.html" style="text-decoration: none;">
+                <button type="button" style="padding: 8px 16px; cursor: pointer;">Login</button>
             </a>
-        </header>
+        </div>
 
-        <main class="card">
-            <h1 style="margin-top: 0;">Math Question Generator</h1>
-            <p class="subtitle">Practice math problems by topic and difficulty</p>
-
-            <div class="controls-grid">
-                <div class="control-group">
-                    <label for="topic-select">Topic:</label>
-                    <select id="topic-select">
-                        <option value="integration" selected>Integration</option>
-                    </select>
-                </div>
-
-                <div class="control-group">
-                    <label for="difficulty-select">Difficulty:</label>
-                    <select id="difficulty-select">
-                        <option value="easy">Easy</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="hard">Hard</option>
-                    </select>
-                </div>
+        <div class="controls-grid">
+            <div class="control-group">
+                <label for="topic-select">Topic:</label>
+                <select id="topic-select">
+                    <option value="integration" selected>Integration</option>
+                </select>
             </div>
 
-            <button id="fetch-btn" type="button">Generate New Question</button>
+            <div class="control-group">
+                <label for="difficulty-select">Difficulty:</label>
+                <select id="difficulty-select">
+                    <option value="easy">Easy</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+            </div>
+        </div>
 
-            <div class="question-box">
-                <div id="question-text">Select options and click generate.</div>
+        <button id="fetch-btn" type="button">Generate New Question</button>
+
+        <div class="question-box">
+            <div id="question-text">Select options and click generate.</div>
+        </div>
+
+        <!-- Answer & Steps Section -->
+        <div id="answer-section" class="answer-section" hidden>
+            <div class="input-group">
+                <input type="text" id="user-answer-input" placeholder="Enter your answer (e.g. x^3*sin(x) + C)" />
+                <button id="submit-btn" type="button">Submit Answer</button>
             </div>
 
-            <!-- Answer & Steps Section -->
-            <div id="answer-section" class="answer-section" hidden>
-                <div class="input-group">
-                    <input type="text" id="user-answer-input" placeholder="Enter your answer (e.g. x^3*sin(x) + C)" />
-                    <button id="submit-btn" type="button">Submit Answer</button>
-                </div>
+            <div id="feedback-box" class="feedback-box" hidden></div>
 
-                <div id="feedback-box" class="feedback-box" hidden></div>
+            <button id="show-steps-btn" class="secondary-btn" type="button">Show Step-by-Step Solution</button>
 
-                <button id="show-steps-btn" class="secondary-btn" type="button">Show Step-by-Step Solution</button>
-
-                <div id="steps-container" class="steps-box" hidden>
-                    <h3>Solution Steps:</h3>
-                    <ol id="steps-list"></ol>
-                </div>
+            <div id="steps-container" class="steps-box" hidden>
+                <h3>Solution Steps:</h3>
+                <ol id="steps-list"></ol>
             </div>
-        </main>
-    </div>
+        </div>
+    </main>
 </body>
 </html>

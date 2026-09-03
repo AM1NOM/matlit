@@ -37,22 +37,13 @@ async function generateQuestion() {
 
     try {
         const res = await fetch(`${BASE_URL}?topic=${el.topic.value}&difficulty=${el.difficulty.value}`, { method: 'POST' });
-
-        // NEW: surface non-2xx responses instead of silently trying to parse them as JSON
-        if (!res.ok) {
-            const bodyText = await res.text();
-            throw new Error(`Server responded ${res.status} ${res.statusText}: ${bodyText.slice(0, 200)}`);
-        }
-
         currentData = await res.json();
-
+        
         el.question.innerHTML = currentData.question;
         if (window.MathJax) MathJax.typesetPromise([el.question]); // Render Math
-
+        
         el.answerSection.hidden = false;
     } catch (err) {
-        // NEW: actually log the real error instead of swallowing it
-        console.error('generateQuestion failed:', err);
         el.question.innerText = 'Failed to generate question.';
     }
 }
@@ -60,7 +51,7 @@ async function generateQuestion() {
 // 3. Check Answer
 function checkAnswer() {
     if (!currentData) return;
-
+    
     // Simple cleanup: remove spaces and lowercase
     const userAns = el.userAns.value.replace(/\s+/g, '').toLowerCase();
     const correctAns = currentData.answer.replace(/\s+/g, '').toLowerCase();
