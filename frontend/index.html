@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' https://www.gstatic.com/firebasejs/ https://cdn.jsdelivr.net 'unsafe-inline'; frame-src https://*.firebaseapp.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com;">
-    
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' https://www.gstatic.com/firebasejs/ https://apis.google.com https://cdn.jsdelivr.net 'unsafe-inline'; frame-src https://*.firebaseapp.com https://accounts.google.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com https://accounts.google.com;">
+
     <title>Math Question Generator</title>
     <link rel="stylesheet" href="style.css">
-    
+
     <script type="module" src="../database/auth.js" defer></script>
     <script src="script.js" defer></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
@@ -15,23 +15,30 @@
 <body>
     <!-- Container aligning header top-left directly above main card -->
     <div class="page-container" style="max-width: 600px; margin: 20px auto; padding: 0 15px;">
-        
+
         <!-- Header positioned above card -->
         <header style="display: flex; justify-content: flex-start; margin-bottom: 12px;">
             <a href="profile.html" id="auth-badge-link" style="text-decoration: none; color: inherit;">
-                <!-- Logged Out Button -->
-                <button id="auth-login-btn" type="button" style="padding: 8px 16px; cursor: pointer;">Login</button>
-                
-                <!-- Logged In User Badge -->
-                <div id="auth-user-info" style="display: flex; align-items: center; gap: 10px; cursor: pointer;" hidden>
-                    <!-- Google Profile Picture -->
-                    <img id="header-user-pic" src="" alt="Profile" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc; display: none;" />
-                    
-                    <!-- Fallback First Letter Circle -->
-                    <div id="header-user-initial" style="width: 36px; height: 36px; border-radius: 50%; background: #007bff; color: white; display: none; align-items: center; justify-content: center; font-weight: bold;"></div>
-                    
-                    <span id="header-user-name" style="font-weight: 600; font-size: 1rem;"></span>
-                </div>
+                <button id="auth-btn" type="button"
+                        style="display: flex; align-items: center; gap: 8px; padding: 6px 16px 6px 6px; cursor: pointer; border: 1px solid #ccc; border-radius: 20px; background: #fff;">
+
+                    <!-- Default profile picture icon (shown when logged out) -->
+                    <svg id="header-default-icon" width="28" height="28" viewBox="0 0 24 24"
+                         style="border-radius: 50%; background: #e9ecef; padding: 3px; box-sizing: border-box; flex-shrink: 0;">
+                        <circle cx="12" cy="8" r="4" fill="#adb5bd"/>
+                        <path d="M4 20c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5" fill="#adb5bd"/>
+                    </svg>
+
+                    <!-- Google profile picture (shown when logged in, has photoURL) -->
+                    <img id="header-user-pic" src="" alt="Profile"
+                         style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; display: none; flex-shrink: 0;" />
+
+                    <!-- Fallback initial circle (shown when logged in, no photoURL) -->
+                    <div id="header-user-initial"
+                         style="width: 28px; height: 28px; border-radius: 50%; background: #007bff; color: white; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; flex-shrink: 0;"></div>
+
+                    <span id="header-auth-label" style="font-weight: 600; font-size: 0.95rem;">Login</span>
+                </button>
             </a>
         </header>
 
