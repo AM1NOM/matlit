@@ -2,13 +2,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { 
     getAuth, 
     signInWithEmailAndPassword, 
+    createUserWithEmailAndPassword,
     GoogleAuthProvider, 
     signInWithPopup, 
     signOut, 
     onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// Replace these with your actual Firebase project config keys
 const firebaseConfig = {
   apiKey: "AIzaSyC1IhcYLT1UT24ZR5ElHkgiuxjxlrKymO0",
   authDomain: "matlit2.firebaseapp.com",
@@ -28,6 +28,10 @@ export async function loginWithEmail(email, password) {
     return await signInWithEmailAndPassword(auth, email, password);
 }
 
+export async function registerWithEmail(email, password) {
+    return await createUserWithEmailAndPassword(auth, email, password);
+}
+
 export async function loginWithGoogle() {
     return await signInWithPopup(auth, googleProvider);
 }
@@ -40,18 +44,18 @@ export function observeAuthState(callback) {
     onAuthStateChanged(auth, callback);
 }
 
-// Login Page UI Event Handlers
+// Login/Register UI Event Handlers
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     const googleBtn = document.getElementById('google-login-btn');
+    const registerBtn = document.getElementById('register-btn');
 
-    // Only attach events if we are currently on the login page
-    if (loginForm && googleBtn) {
+    if (loginForm) {
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const errorMsg = document.getElementById('login-error');
 
-        // Email/Password Login Form
+        // Email/Password Login
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             errorMsg.hidden = true;
@@ -64,16 +68,37 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Google Sign-In Button
-        googleBtn.addEventListener('click', async () => {
-            errorMsg.hidden = true;
-            try {
-                await loginWithGoogle();
-                window.location.href = 'index.html';
-            } catch (error) {
-                errorMsg.innerText = error.message;
-                errorMsg.hidden = false;
-            }
-        });
+        // Email/Password Register
+        if (registerBtn) {
+            registerBtn.addEventListener('click', async () => {
+                errorMsg.hidden = true;
+                if (!emailInput.value || !passwordInput.value) {
+                    errorMsg.innerText = "Please enter an email and password to register.";
+                    errorMsg.hidden = false;
+                    return;
+                }
+                try {
+                    await registerWithEmail(emailInput.value, passwordInput.value);
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    errorMsg.innerText = error.message;
+                    errorMsg.hidden = false;
+                }
+            });
+        }
+
+        // Google Sign-In
+        if (googleBtn) {
+            googleBtn.addEventListener('click', async () => {
+                errorMsg.hidden = true;
+                try {
+                    await loginWithGoogle();
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    errorMsg.innerText = error.message;
+                    errorMsg.hidden = false;
+                }
+            });
+        }
     }
 });
