@@ -1,10 +1,21 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+<<<<<<< HEAD
 import {
     getAuth,
     GoogleAuthProvider,
     signInWithPopup,
     signOut,
     onAuthStateChanged
+=======
+import { 
+    getAuth, 
+    signInWithEmailAndPassword, 
+    createUserWithEmailAndPassword,
+    GoogleAuthProvider, 
+    signInWithPopup,
+    signOut, 
+    onAuthStateChanged 
+>>>>>>> b43eb5f7b2bd7dadd1a1eb89d5a9ec935012a8c9
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -22,8 +33,26 @@ const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
+<<<<<<< HEAD
 // ---- Core auth actions ----
 
+=======
+// Configure Google provider to persist session
+googleProvider.setCustomParameters({
+    'prompt': 'select_account'
+});
+
+// Core Authentication Functions
+export async function loginWithEmail(email, password) {
+    return await signInWithEmailAndPassword(auth, email, password);
+}
+
+export async function registerWithEmail(email, password) {
+    return await createUserWithEmailAndPassword(auth, email, password);
+}
+
+// Use popup instead of redirect to maintain session better
+>>>>>>> b43eb5f7b2bd7dadd1a1eb89d5a9ec935012a8c9
 export async function loginWithGoogle() {
     return await signInWithPopup(auth, googleProvider);
 }
@@ -32,6 +61,7 @@ export async function logoutUser() {
     return await signOut(auth);
 }
 
+<<<<<<< HEAD
 // ---- UI updater: shows profile pic/initial + name, or the login button ----
 
 function renderUser(user) {
@@ -73,6 +103,86 @@ onAuthStateChanged(auth, renderUser);
 // ---- Wire up buttons once the DOM is ready ----
 
 document.addEventListener('DOMContentLoaded', () => {
+=======
+// Global Auth Observer - runs immediately on import
+onAuthStateChanged(auth, (user) => {
+    // Header UI Elements (index.html)
+    const headerLoginBtn = document.getElementById('auth-login-btn');
+    const headerUserInfo = document.getElementById('auth-user-info');
+    const headerUserPic = document.getElementById('header-user-pic');
+    const headerUserInitial = document.getElementById('header-user-initial');
+    const headerUserName = document.getElementById('header-user-name');
+
+    // Profile Page Elements (profile.html)
+    const loginSection = document.getElementById('login-section');
+    const profileSection = document.getElementById('profile-section');
+
+    if (user) {
+        const displayName = user.displayName || "";
+        const emailName = user.email ? user.email.split('@')[0] : "User";
+        const firstName = displayName ? displayName.split(' ')[0] : emailName;
+        const initial = firstName.charAt(0).toUpperCase();
+
+        // 1. Update index.html Header
+        if (headerLoginBtn && headerUserInfo) {
+            headerLoginBtn.hidden = true;
+            headerUserInfo.style.display = 'flex';
+            headerUserName.innerText = firstName;
+
+            if (user.photoURL) {
+                headerUserPic.src = user.photoURL;
+                headerUserPic.style.display = 'block';
+                headerUserInitial.style.display = 'none';
+            } else {
+                headerUserPic.style.display = 'none';
+                headerUserInitial.innerText = initial;
+                headerUserInitial.style.display = 'flex';
+            }
+        }
+
+        // 2. Update profile.html View
+        if (loginSection && profileSection) {
+            loginSection.hidden = true;
+            profileSection.hidden = false;
+
+            const userNameEl = document.getElementById('user-name');
+            const userEmailEl = document.getElementById('user-email');
+            if (userNameEl) userNameEl.innerText = user.displayName || firstName;
+            if (userEmailEl) userEmailEl.innerText = user.email;
+
+            const userPic = document.getElementById('user-pic');
+            const userInitial = document.getElementById('user-initial');
+
+            if (userPic && userInitial) {
+                if (user.photoURL) {
+                    userPic.src = user.photoURL;
+                    userPic.style.display = 'block';
+                    userInitial.style.display = 'none';
+                } else {
+                    userPic.style.display = 'none';
+                    userInitial.innerText = initial;
+                    userInitial.style.display = 'flex';
+                }
+            }
+        }
+    } else {
+        // Logged Out States
+        if (headerLoginBtn && headerUserInfo) {
+            headerLoginBtn.hidden = false;
+            headerUserInfo.style.display = 'none';
+        }
+        if (loginSection && profileSection) {
+            loginSection.hidden = false;
+            profileSection.hidden = true;
+        }
+    }
+});
+
+// Wait for DOM and set up event listeners
+document.addEventListener('DOMContentLoaded', () => {
+    // Event Listeners for Forms and Buttons
+    const loginForm = document.getElementById('login-form');
+>>>>>>> b43eb5f7b2bd7dadd1a1eb89d5a9ec935012a8c9
     const googleBtn = document.getElementById('google-login-btn');
     const logoutBtn = document.getElementById('logout-btn');
     const errorMsg = document.getElementById('login-error');
@@ -91,6 +201,40 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
+<<<<<<< HEAD
+=======
+
+        if (registerBtn) {
+            registerBtn.addEventListener('click', async () => {
+                errorMsg.hidden = true;
+                if (!emailInput.value || !passwordInput.value) {
+                    errorMsg.innerText = "Please enter an email and password to register.";
+                    errorMsg.hidden = false;
+                    return;
+                }
+                try {
+                    await registerWithEmail(emailInput.value, passwordInput.value);
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    errorMsg.innerText = error.message;
+                    errorMsg.hidden = false;
+                }
+            });
+        }
+
+        if (googleBtn) {
+            googleBtn.addEventListener('click', async () => {
+                errorMsg.hidden = true;
+                try {
+                    await loginWithGoogle();
+                    // Popup closes and returns to same page with user logged in
+                } catch (error) {
+                    errorMsg.innerText = error.message;
+                    errorMsg.hidden = false;
+                }
+            });
+        }
+>>>>>>> b43eb5f7b2bd7dadd1a1eb89d5a9ec935012a8c9
     }
 
     if (logoutBtn) {
