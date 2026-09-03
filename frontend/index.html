@@ -10,6 +10,30 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </head>
 <body>
+    <header style="position: fixed; top: 0; left: 0; margin: 0; padding: 8px; z-index: 10;">
+        <a href="profile.html" id="auth-badge-link" style="text-decoration: none; color: inherit;">
+            <button id="auth-btn" type="button"
+                    style="display: flex; align-items: center; gap: 8px; padding: 6px 16px 6px 6px; cursor: pointer; border: 1px solid #ccc; border-radius: 20px; background: #fff;">
+
+                <!-- Default profile picture icon (shown when logged out) -->
+                <svg id="header-default-icon" width="28" height="28" viewBox="0 0 24 24"
+                        style="border-radius: 50%; background: #e9ecef; padding: 3px; box-sizing: border-box; flex-shrink: 0;">
+                    <circle cx="12" cy="8" r="4" fill="#adb5bd"/>
+                    <path d="M4 20c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5" fill="#adb5bd"/>
+                </svg>
+
+                <!-- Google profile picture (shown when logged in, has photoURL) -->
+                <img id="header-user-pic" src="" alt="Profile"
+                        style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; display: none; flex-shrink: 0;" />
+
+                <!-- Fallback initial circle (shown when logged in, no photoURL) -->
+                <div id="header-user-initial"
+                        style="width: 28px; height: 28px; border-radius: 50%; background: #007bff; color: white; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; flex-shrink: 0;"></div>
+
+                <span id="header-auth-label" style="font-weight: 600; font-size: 0.95rem;">Login</span>
+            </button>
+        </a>
+    </header>
     <main class="card">
         <!-- Top bar with Title & Login Button -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
