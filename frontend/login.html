@@ -6,15 +6,13 @@
     <title>Login - Math Question Generator</title>
     <link rel="stylesheet" href="style.css">
     
-    <!-- Link to external JS module -->
     <script type="module" src="../database/auth.js" defer></script>
 </head>
 <body>
     <main class="card">
         <h1>Welcome Back</h1>
-        <p class="subtitle">Log in to track your math progress</p>
+        <p class="subtitle">Log in or create an account to track progress</p>
 
-        <!-- Email/Password Form -->
         <form id="login-form" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
             <div class="control-group">
                 <label for="email">Email:</label>
@@ -26,13 +24,14 @@
                 <input type="password" id="password" placeholder="Enter your password" style="width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box;" required />
             </div>
 
-            <button type="submit" style="width: 100%; padding: 12px; cursor: pointer;">Log In</button>
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" style="flex: 1; padding: 12px; cursor: pointer;">Log In</button>
+                <button id="register-btn" type="button" style="flex: 1; padding: 12px; cursor: pointer; background: #6c757d; color: white; border: none; border-radius: 4px;">Register</button>
+            </div>
         </form>
 
-        <!-- Divider -->
         <div style="text-align: center; margin: 15px 0; color: #666;">OR</div>
 
-        <!-- Google Login Button -->
         <button id="google-login-btn" type="button" style="width: 100%; padding: 12px; cursor: pointer; background: #fff; border: 1px solid #ccc;">
             Sign in with Google
         </button>
