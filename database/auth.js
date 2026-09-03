@@ -5,6 +5,7 @@ import {
     createUserWithEmailAndPassword,
     GoogleAuthProvider, 
     signInWithRedirect, 
+    getRedirectResult,
     signOut, 
     onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -23,6 +24,17 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
+// Catch and process the auth result when returning from Google's redirect
+getRedirectResult(auth)
+  .then((result) => {
+    if (result) {
+      console.log("Successfully authenticated via redirect:", result.user);
+    }
+  })
+  .catch((error) => {
+    console.error("Redirect authentication error:", error.code, error.message);
+  });
+
 // Core Authentication Functions
 export async function loginWithEmail(email, password) {
     return await signInWithEmailAndPassword(auth, email, password);
@@ -32,7 +44,6 @@ export async function registerWithEmail(email, password) {
     return await createUserWithEmailAndPassword(auth, email, password);
 }
 
-// Switched to Redirect method (bypasses COOP/popup blocks)
 export async function loginWithGoogle() {
     return await signInWithRedirect(auth, googleProvider);
 }
@@ -43,14 +54,12 @@ export async function logoutUser() {
 
 // Global Auth Observer
 document.addEventListener('DOMContentLoaded', () => {
-    // Header UI Elements (index.html)
     const headerLoginBtn = document.getElementById('auth-login-btn');
     const headerUserInfo = document.getElementById('auth-user-info');
     const headerUserPic = document.getElementById('header-user-pic');
     const headerUserInitial = document.getElementById('header-user-initial');
     const headerUserName = document.getElementById('header-user-name');
 
-    // Profile Page Elements (profile.html)
     const loginSection = document.getElementById('login-section');
     const profileSection = document.getElementById('profile-section');
 
@@ -100,7 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } else {
-            // Logged Out States
             if (headerLoginBtn && headerUserInfo) {
                 headerLoginBtn.hidden = false;
                 headerUserInfo.style.display = 'none';
@@ -112,7 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Event Listeners for Forms and Buttons
     const loginForm = document.getElementById('login-form');
     const googleBtn = document.getElementById('google-login-btn');
     const registerBtn = document.getElementById('register-btn');
@@ -157,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
             googleBtn.addEventListener('click', async () => {
                 errorMsg.hidden = true;
                 try {
-                    await loginWithGoogle(); // Triggers page redirect
+                    await loginWithGoogle();
                 } catch (error) {
                     errorMsg.innerText = error.message;
                     errorMsg.hidden = false;
