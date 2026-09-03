@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' https://www.gstatic.com/firebasejs/ https://cdn.jsdelivr.net 'unsafe-inline'; frame-src https://*.firebaseapp.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com;">
     
     <title>Math Question Generator</title>
     <link rel="stylesheet" href="style.css">
@@ -27,7 +28,7 @@
                     <img id="header-user-pic" src="" alt="Profile" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc; display: none;" />
                     
                     <!-- Fallback First Letter Circle -->
-                    <div id="header-user-initial" style="width: 36px; height: 36px; border-radius: 50%; background: #007bff; color: white; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;"></div>
+                    <div id="header-user-initial" style="width: 36px; height: 36px; border-radius: 50%; background: #007bff; color: white; display: none; align-items: center; justify-content: center; font-weight: bold;"></div>
                     
                     <span id="header-user-name" style="font-weight: 600; font-size: 1rem;"></span>
                 </div>
