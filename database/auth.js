@@ -5,6 +5,7 @@ import {
     createUserWithEmailAndPassword,
     GoogleAuthProvider, 
     signInWithRedirect, 
+    getRedirectResult,
     signOut, 
     onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -40,6 +41,10 @@ export async function loginWithGoogle() {
 export async function logoutUser() {
     return await signOut(auth);
 }
+
+getRedirectResult(auth).catch((error) => {
+    console.error("Redirect result error:", error);
+});
 
 // Global Auth Observer
 document.addEventListener('DOMContentLoaded', () => {
