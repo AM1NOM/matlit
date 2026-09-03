@@ -4,7 +4,7 @@ import {
     signInWithEmailAndPassword, 
     createUserWithEmailAndPassword,
     GoogleAuthProvider, 
-    signInWithPopup, 
+    signInWithRedirect, 
     signOut, 
     onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -32,8 +32,9 @@ export async function registerWithEmail(email, password) {
     return await createUserWithEmailAndPassword(auth, email, password);
 }
 
+// Switched to Redirect method (bypasses COOP/popup blocks)
 export async function loginWithGoogle() {
-    return await signInWithPopup(auth, googleProvider);
+    return await signInWithRedirect(auth, googleProvider);
 }
 
 export async function logoutUser() {
@@ -55,13 +56,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            // Determine display names & initial
             const displayName = user.displayName || "";
             const emailName = user.email ? user.email.split('@')[0] : "User";
             const firstName = displayName ? displayName.split(' ')[0] : emailName;
             const initial = firstName.charAt(0).toUpperCase();
 
-            // --- 1. Update index.html Header ---
+            // 1. Update index.html Header
             if (headerLoginBtn && headerUserInfo) {
                 headerLoginBtn.hidden = true;
                 headerUserInfo.style.display = 'flex';
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // --- 2. Update profile.html View ---
+            // 2. Update profile.html View
             if (loginSection && profileSection) {
                 loginSection.hidden = true;
                 profileSection.hidden = false;
@@ -157,8 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
             googleBtn.addEventListener('click', async () => {
                 errorMsg.hidden = true;
                 try {
-                    await loginWithGoogle();
-                    window.location.href = 'index.html';
+                    await loginWithGoogle(); // Triggers page redirect
                 } catch (error) {
                     errorMsg.innerText = error.message;
                     errorMsg.hidden = false;
