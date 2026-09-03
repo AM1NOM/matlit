@@ -42,142 +42,157 @@ export async function logoutUser() {
     return await signOut(auth);
 }
 
-getRedirectResult(auth).catch((error) => {
-    console.error("Redirect result error:", error);
-});
-
-// Global Auth Observer
-document.addEventListener('DOMContentLoaded', () => {
-    // Header UI Elements (index.html)
-    const headerLoginBtn = document.getElementById('auth-login-btn');
-    const headerUserInfo = document.getElementById('auth-user-info');
-    const headerUserPic = document.getElementById('header-user-pic');
-    const headerUserInitial = document.getElementById('header-user-initial');
-    const headerUserName = document.getElementById('header-user-name');
-
-    // Profile Page Elements (profile.html)
-    const loginSection = document.getElementById('login-section');
-    const profileSection = document.getElementById('profile-section');
-
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            const displayName = user.displayName || "";
-            const emailName = user.email ? user.email.split('@')[0] : "User";
-            const firstName = displayName ? displayName.split(' ')[0] : emailName;
-            const initial = firstName.charAt(0).toUpperCase();
-
-            // 1. Update index.html Header
-            if (headerLoginBtn && headerUserInfo) {
-                headerLoginBtn.hidden = true;
-                headerUserInfo.style.display = 'flex';
-                headerUserName.innerText = firstName;
-
-                if (user.photoURL) {
-                    headerUserPic.src = user.photoURL;
-                    headerUserPic.style.display = 'block';
-                    headerUserInitial.style.display = 'none';
-                } else {
-                    headerUserPic.style.display = 'none';
-                    headerUserInitial.innerText = initial;
-                    headerUserInitial.style.display = 'flex';
-                }
-            }
-
-            // 2. Update profile.html View
-            if (loginSection && profileSection) {
-                loginSection.hidden = true;
-                profileSection.hidden = false;
-
-                document.getElementById('user-name').innerText = user.displayName || firstName;
-                document.getElementById('user-email').innerText = user.email;
-
-                const userPic = document.getElementById('user-pic');
-                const userInitial = document.getElementById('user-initial');
-
-                if (user.photoURL) {
-                    userPic.src = user.photoURL;
-                    userPic.style.display = 'block';
-                    userInitial.style.display = 'none';
-                } else {
-                    userPic.style.display = 'none';
-                    userInitial.innerText = initial;
-                    userInitial.style.display = 'flex';
-                }
-            }
-        } else {
-            // Logged Out States
-            if (headerLoginBtn && headerUserInfo) {
-                headerLoginBtn.hidden = false;
-                headerUserInfo.style.display = 'none';
-            }
-            if (loginSection && profileSection) {
-                loginSection.hidden = false;
-                profileSection.hidden = true;
-            }
+// Handle Google redirect result BEFORE setting up auth listener
+async function handleRedirectResult() {
+    try {
+        const result = await getRedirectResult(auth);
+        if (result && result.user) {
+            console.log("User signed in via redirect:", result.user.email);
         }
-    });
+    } catch (error) {
+        console.error("Redirect result error:", error);
+    }
+}
 
-    // Event Listeners for Forms and Buttons
-    const loginForm = document.getElementById('login-form');
-    const googleBtn = document.getElementById('google-login-btn');
-    const registerBtn = document.getElementById('register-btn');
-    const logoutBtn = document.getElementById('logout-btn');
+// Initialize Auth Listener
+async function initAuthListener() {
+    await handleRedirectResult();
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        // Header UI Elements (index.html)
+        const headerLoginBtn = document.getElementById('auth-login-btn');
+        const headerUserInfo = document.getElementById('auth-user-info');
+        const headerUserPic = document.getElementById('header-user-pic');
+        const headerUserInitial = document.getElementById('header-user-initial');
+        const headerUserName = document.getElementById('header-user-name');
 
-    if (loginForm) {
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        const errorMsg = document.getElementById('login-error');
+        // Profile Page Elements (profile.html)
+        const loginSection = document.getElementById('login-section');
+        const profileSection = document.getElementById('profile-section');
 
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            errorMsg.hidden = true;
-            try {
-                await loginWithEmail(emailInput.value, passwordInput.value);
-                window.location.href = 'index.html';
-            } catch (error) {
-                errorMsg.innerText = error.message;
-                errorMsg.hidden = false;
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const displayName = user.displayName || "";
+                const emailName = user.email ? user.email.split('@')[0] : "User";
+                const firstName = displayName ? displayName.split(' ')[0] : emailName;
+                const initial = firstName.charAt(0).toUpperCase();
+
+                // 1. Update index.html Header
+                if (headerLoginBtn && headerUserInfo) {
+                    headerLoginBtn.hidden = true;
+                    headerUserInfo.style.display = 'flex';
+                    headerUserName.innerText = firstName;
+
+                    if (user.photoURL) {
+                        headerUserPic.src = user.photoURL;
+                        headerUserPic.style.display = 'block';
+                        headerUserInitial.style.display = 'none';
+                    } else {
+                        headerUserPic.style.display = 'none';
+                        headerUserInitial.innerText = initial;
+                        headerUserInitial.style.display = 'flex';
+                    }
+                }
+
+                // 2. Update profile.html View
+                if (loginSection && profileSection) {
+                    loginSection.hidden = true;
+                    profileSection.hidden = false;
+
+                    document.getElementById('user-name').innerText = user.displayName || firstName;
+                    document.getElementById('user-email').innerText = user.email;
+
+                    const userPic = document.getElementById('user-pic');
+                    const userInitial = document.getElementById('user-initial');
+
+                    if (user.photoURL) {
+                        userPic.src = user.photoURL;
+                        userPic.style.display = 'block';
+                        userInitial.style.display = 'none';
+                    } else {
+                        userPic.style.display = 'none';
+                        userInitial.innerText = initial;
+                        userInitial.style.display = 'flex';
+                    }
+                }
+            } else {
+                // Logged Out States
+                if (headerLoginBtn && headerUserInfo) {
+                    headerLoginBtn.hidden = false;
+                    headerUserInfo.style.display = 'none';
+                }
+                if (loginSection && profileSection) {
+                    loginSection.hidden = false;
+                    profileSection.hidden = true;
+                }
             }
         });
 
-        if (registerBtn) {
-            registerBtn.addEventListener('click', async () => {
+        // Event Listeners for Forms and Buttons
+        const loginForm = document.getElementById('login-form');
+        const googleBtn = document.getElementById('google-login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        if (loginForm) {
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const errorMsg = document.getElementById('login-error');
+
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
                 errorMsg.hidden = true;
-                if (!emailInput.value || !passwordInput.value) {
-                    errorMsg.innerText = "Please enter an email and password to register.";
-                    errorMsg.hidden = false;
-                    return;
-                }
                 try {
-                    await registerWithEmail(emailInput.value, passwordInput.value);
+                    await loginWithEmail(emailInput.value, passwordInput.value);
                     window.location.href = 'index.html';
                 } catch (error) {
                     errorMsg.innerText = error.message;
                     errorMsg.hidden = false;
                 }
             });
+
+            if (registerBtn) {
+                registerBtn.addEventListener('click', async () => {
+                    errorMsg.hidden = true;
+                    if (!emailInput.value || !passwordInput.value) {
+                        errorMsg.innerText = "Please enter an email and password to register.";
+                        errorMsg.hidden = false;
+                        return;
+                    }
+                    try {
+                        await registerWithEmail(emailInput.value, passwordInput.value);
+                        window.location.href = 'index.html';
+                    } catch (error) {
+                        errorMsg.innerText = error.message;
+                        errorMsg.hidden = false;
+                    }
+                });
+            }
+
+            if (googleBtn) {
+                googleBtn.addEventListener('click', async () => {
+                    errorMsg.hidden = true;
+                    try {
+                        await loginWithGoogle(); // Triggers page redirect
+                    } catch (error) {
+                        errorMsg.innerText = error.message;
+                        errorMsg.hidden = false;
+                    }
+                });
+            }
         }
 
-        if (googleBtn) {
-            googleBtn.addEventListener('click', async () => {
-                errorMsg.hidden = true;
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
                 try {
-                    await loginWithGoogle(); // Triggers page redirect
+                    await logoutUser();
                 } catch (error) {
-                    errorMsg.innerText = error.message;
-                    errorMsg.hidden = false;
+                    alert("Error signing out: " + error.message);
                 }
             });
         }
-    }
+    });
+}
 
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            try {
-                await logoutUser();
-            } catch (error) {
-                alert("Error signing out: " + error.message);
-            }
-        });
-    }
-});
+// Start the initialization
+initAuthListener();
