@@ -1,13 +1,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { 
-    getAuth, 
-    signInWithEmailAndPassword, 
-    createUserWithEmailAndPassword,
-    GoogleAuthProvider, 
-    signInWithRedirect, 
-    getRedirectResult,
-    signOut, 
-    onAuthStateChanged 
+import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup,
+    signOut,
+    onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -23,152 +20,77 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: 'select_account' });
 
-// Core Authentication Functions
-export async function loginWithEmail(email, password) {
-    return await signInWithEmailAndPassword(auth, email, password);
-}
+// ---- Core auth actions ----
 
-export async function registerWithEmail(email, password) {
-    return await createUserWithEmailAndPassword(auth, email, password);
-}
-
-// Switched to Redirect method (bypasses COOP/popup blocks)
 export async function loginWithGoogle() {
-    return await signInWithRedirect(auth, googleProvider);
+    return await signInWithPopup(auth, googleProvider);
 }
 
 export async function logoutUser() {
     return await signOut(auth);
 }
 
-getRedirectResult(auth).catch((error) => {
-    console.error("Redirect result error:", error);
-});
+// ---- UI updater: shows profile pic/initial + name, or the login button ----
 
-// Global Auth Observer
-document.addEventListener('DOMContentLoaded', () => {
-    // Header UI Elements (index.html)
-    const headerLoginBtn = document.getElementById('auth-login-btn');
-    const headerUserInfo = document.getElementById('auth-user-info');
-    const headerUserPic = document.getElementById('header-user-pic');
-    const headerUserInitial = document.getElementById('header-user-initial');
-    const headerUserName = document.getElementById('header-user-name');
-
-    // Profile Page Elements (profile.html)
+function renderUser(user) {
     const loginSection = document.getElementById('login-section');
     const profileSection = document.getElementById('profile-section');
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            const displayName = user.displayName || "";
-            const emailName = user.email ? user.email.split('@')[0] : "User";
-            const firstName = displayName ? displayName.split(' ')[0] : emailName;
-            const initial = firstName.charAt(0).toUpperCase();
+    // If this page doesn't have these elements, nothing to do.
+    if (!loginSection || !profileSection) return;
 
-            // 1. Update index.html Header
-            if (headerLoginBtn && headerUserInfo) {
-                headerLoginBtn.hidden = true;
-                headerUserInfo.style.display = 'flex';
-                headerUserName.innerText = firstName;
+    if (user) {
+        loginSection.hidden = true;
+        profileSection.hidden = false;
 
-                if (user.photoURL) {
-                    headerUserPic.src = user.photoURL;
-                    headerUserPic.style.display = 'block';
-                    headerUserInitial.style.display = 'none';
-                } else {
-                    headerUserPic.style.display = 'none';
-                    headerUserInitial.innerText = initial;
-                    headerUserInitial.style.display = 'flex';
-                }
-            }
+        const nameEl = document.getElementById('user-name');
+        const picEl = document.getElementById('user-pic');
+        const initialEl = document.getElementById('user-initial');
 
-            // 2. Update profile.html View
-            if (loginSection && profileSection) {
-                loginSection.hidden = true;
-                profileSection.hidden = false;
+        const fullName = user.displayName || "User";
+        if (nameEl) nameEl.innerText = fullName;
 
-                document.getElementById('user-name').innerText = user.displayName || firstName;
-                document.getElementById('user-email').innerText = user.email;
-
-                const userPic = document.getElementById('user-pic');
-                const userInitial = document.getElementById('user-initial');
-
-                if (user.photoURL) {
-                    userPic.src = user.photoURL;
-                    userPic.style.display = 'block';
-                    userInitial.style.display = 'none';
-                } else {
-                    userPic.style.display = 'none';
-                    userInitial.innerText = initial;
-                    userInitial.style.display = 'flex';
-                }
-            }
+        if (user.photoURL) {
+            picEl.src = user.photoURL;
+            picEl.style.display = 'block';
+            initialEl.style.display = 'none';
         } else {
-            // Logged Out States
-            if (headerLoginBtn && headerUserInfo) {
-                headerLoginBtn.hidden = false;
-                headerUserInfo.style.display = 'none';
-            }
-            if (loginSection && profileSection) {
-                loginSection.hidden = false;
-                profileSection.hidden = true;
-            }
+            picEl.style.display = 'none';
+            initialEl.innerText = fullName.charAt(0).toUpperCase();
+            initialEl.style.display = 'flex';
         }
-    });
+    } else {
+        loginSection.hidden = false;
+        profileSection.hidden = true;
+    }
+}
 
-    // Event Listeners for Forms and Buttons
-    const loginForm = document.getElementById('login-form');
+// Runs on every page load AND right after login/logout completes
+onAuthStateChanged(auth, renderUser);
+
+// ---- Wire up buttons once the DOM is ready ----
+
+document.addEventListener('DOMContentLoaded', () => {
     const googleBtn = document.getElementById('google-login-btn');
-    const registerBtn = document.getElementById('register-btn');
     const logoutBtn = document.getElementById('logout-btn');
+    const errorMsg = document.getElementById('login-error');
 
-    if (loginForm) {
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        const errorMsg = document.getElementById('login-error');
-
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            errorMsg.hidden = true;
+    if (googleBtn) {
+        googleBtn.addEventListener('click', async () => {
+            if (errorMsg) errorMsg.hidden = true;
             try {
-                await loginWithEmail(emailInput.value, passwordInput.value);
-                window.location.href = 'index.html';
+                await loginWithGoogle();
+                // onAuthStateChanged fires automatically and updates the UI
             } catch (error) {
-                errorMsg.innerText = error.message;
-                errorMsg.hidden = false;
+                console.error('Google sign-in failed:', error);
+                if (errorMsg) {
+                    errorMsg.innerText = "Sign-in failed. Please try again.";
+                    errorMsg.hidden = false;
+                }
             }
         });
-
-        if (registerBtn) {
-            registerBtn.addEventListener('click', async () => {
-                errorMsg.hidden = true;
-                if (!emailInput.value || !passwordInput.value) {
-                    errorMsg.innerText = "Please enter an email and password to register.";
-                    errorMsg.hidden = false;
-                    return;
-                }
-                try {
-                    await registerWithEmail(emailInput.value, passwordInput.value);
-                    window.location.href = 'index.html';
-                } catch (error) {
-                    errorMsg.innerText = error.message;
-                    errorMsg.hidden = false;
-                }
-            });
-        }
-
-        if (googleBtn) {
-            googleBtn.addEventListener('click', async () => {
-                errorMsg.hidden = true;
-                try {
-                    await loginWithGoogle(); // Triggers page redirect
-                } catch (error) {
-                    errorMsg.innerText = error.message;
-                    errorMsg.hidden = false;
-                }
-            });
-        }
     }
 
     if (logoutBtn) {
@@ -176,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 await logoutUser();
             } catch (error) {
+                console.error('Sign-out failed:', error);
                 alert("Error signing out: " + error.message);
             }
         });

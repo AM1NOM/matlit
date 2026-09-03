@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' https://www.gstatic.com/firebasejs/ 'unsafe-eval'; frame-src https://*.firebaseapp.com;">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' https://www.gstatic.com/firebasejs/ https://apis.google.com 'unsafe-inline'; frame-src https://*.firebaseapp.com https://accounts.google.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com https://accounts.google.com;">
     <title>Account - Math Question Generator</title>
     <link rel="stylesheet" href="style.css">
-    
     <script type="module" src="../database/auth.js" defer></script>
 </head>
 <body>
     <main class="card">
-        
+
         <!-- SECTION 1: Shown when LOGGED IN -->
         <div id="profile-section" style="text-align: center;" hidden>
             <h1>Your Profile</h1>
@@ -19,16 +18,18 @@
 
             <div style="margin: 20px 0; display: flex; flex-direction: column; align-items: center;">
                 <!-- Profile Image -->
-                <img id="user-pic" src="" alt="Profile Picture" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc; margin-bottom: 10px; display: none;" />
-                
+                <img id="user-pic" src="" alt="Profile Picture"
+                     style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc; margin-bottom: 10px; display: none;" />
+
                 <!-- Fallback Initial Circle -->
-                <div id="user-initial" style="width: 90px; height: 90px; border-radius: 50%; background: #007bff; color: white; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 36px; margin-bottom: 10px;"></div>
+                <div id="user-initial"
+                     style="width: 90px; height: 90px; border-radius: 50%; background: #007bff; color: white; display: none; align-items: center; justify-content: center; font-weight: bold; font-size: 2.5rem; margin-bottom: 10px;"></div>
 
                 <h2 id="user-name" style="margin: 5px 0;">Loading...</h2>
-                <p id="user-email" style="color: #666; margin: 0;"></p>
             </div>
 
-            <button id="logout-btn" type="button" style="width: 100%; padding: 12px; cursor: pointer; background: #dc3545; color: white; border: none; border-radius: 4px; font-weight: bold; margin-top: 15px;">
+            <button id="logout-btn" type="button"
+                    style="width: 100%; padding: 12px; cursor: pointer; background: #dc3545; color: white; border: none; border-radius: 4px; font-weight: bold; margin-top: 20px;">
                 Log Out
             </button>
         </div>
@@ -36,30 +37,10 @@
         <!-- SECTION 2: Shown when LOGGED OUT -->
         <div id="login-section">
             <h1>Welcome Back</h1>
-            <p class="subtitle">Log in or create an account to track progress</p>
+            <p class="subtitle">Log in with Google to track your progress</p>
 
-            <form id="login-form" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
-                <div class="control-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" placeholder="Enter your email" autocomplete="email" style="width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box;" required />
-
-
-                </div>
-
-                <div class="control-group">
-                    <label for="password">Password:</label>
-                    <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" style="width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box;" required />
-                </div>
-
-                <div style="display: flex; gap: 10px;">
-                    <button type="submit" style="flex: 1; padding: 12px; cursor: pointer;">Log In</button>
-                    <button id="register-btn" type="button" style="flex: 1; padding: 12px; cursor: pointer; background: #6c757d; color: white; border: none; border-radius: 4px;">Register</button>
-                </div>
-            </form>
-
-            <div style="text-align: center; margin: 15px 0; color: #666;">OR</div>
-
-            <button id="google-login-btn" type="button" style="width: 100%; padding: 12px; cursor: pointer; background: #fff; border: 1px solid #ccc;">
+            <button id="google-login-btn" type="button"
+                    style="width: 100%; padding: 12px; margin-top: 20px; cursor: pointer; background: #fff; border: 1px solid #ccc; border-radius: 4px; font-weight: bold;">
                 Sign in with Google
             </button>
 
