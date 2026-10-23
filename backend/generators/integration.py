@@ -1,11 +1,7 @@
 import sympy
 from sympy import symbols, integrate, diff, simplify, latex
-
-x = symbols('x')
-
-
-
 import random
+x = symbols('x')
 
 def easy_antiderivative():
     degree = random.randint(2, 4)
