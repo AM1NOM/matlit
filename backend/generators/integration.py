@@ -8,13 +8,11 @@ x = symbols('x')
 import random
 
 def easy_antiderivative():
-    # simple polynomial: guarantees basic power-rule integrals
     degree = random.randint(2, 4)
     coeffs = [random.randint(-5, 5) for _ in range(degree + 1)]
     return sum(c * x**i for i, c in enumerate(coeffs) if c != 0) or x
 
 def medium_antiderivative():
-    # adds trig / exponential terms -> needs standard rules, not just power rule
     choices = [
         sympy.sin(random.randint(1, 3) * x),
         sympy.cos(random.randint(1, 3) * x),
@@ -25,7 +23,6 @@ def medium_antiderivative():
     return random.randint(1, 5) * a + random.randint(1, 5) * b
 
 def hard_antiderivative():
-    # products -> differentiating gives something needing substitution/parts to reverse
     n = random.randint(2, 3)
     base = x**n
     wrapper = random.choice([sympy.sin(x), sympy.cos(x), sympy.exp(x), sympy.log(x)])
